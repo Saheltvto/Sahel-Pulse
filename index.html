@@ -6,6 +6,7 @@
   <title>قطعات یدکی موتور سیکلت پالس - نسخه آفلاین</title>
   <meta name="theme-color" content="#0a0b0d">
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
@@ -450,6 +451,9 @@
     @keyframes spin{to{transform:rotate(360deg)}}
 
     .mobile-only{display:none}
+    .sync-status{font-size:10px;color:var(--text-faint);margin-right:8px;padding:3px 10px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);}
+    .sync-status.online{color:var(--green);border-color:var(--green);}
+    .sync-status.offline{color:var(--red);border-color:var(--red);}
 
     @media(max-width:1050px){
       .cards{grid-template-columns:repeat(2,1fr)}
@@ -583,6 +587,7 @@
 
       .toast{top:66px;width:calc(100% - 28px);text-align:center}
       .delete-modal-card{padding:26px 18px}
+      .sync-status{font-size:8px;padding:2px 8px;margin-right:4px}
     }
 
     @media(max-width:390px){
@@ -606,6 +611,7 @@
       </div>
     </div>
     <div class="top-actions">
+      <span class="sync-status" id="syncStatus">● آفلاین</span>
       <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="تغییر پوسته">☀</button>
       <button class="icon-btn" onclick="exportData()" title="پشتیبان‌گیری">💾</button>
       <button class="icon-btn" onclick="document.getElementById('importFile').click()" title="بازیابی">📂</button>
@@ -971,11 +977,69 @@
 
   <script>
     // ============================================
+    // Persian Date Utilities
+    // ============================================
+    function toPersianDate(date) {
+      const d = new Date(date);
+      const jd = d.toLocaleDateString('fa-IR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).replace(/\//g, '-');
+      return jd;
+    }
+
+    function getTodayPersian() {
+      return toPersianDate(new Date());
+    }
+
+    // ============================================
+    // Broadcast Channel for Sync
+    // ============================================
+    let broadcastChannel = null;
+    let syncListeners = [];
+
+    function initBroadcastChannel() {
+      try {
+        if ('BroadcastChannel' in window) {
+          broadcastChannel = new BroadcastChannel('pulse-parts-sync');
+          broadcastChannel.onmessage = (event) => {
+            if (event.data.type === 'DATA_CHANGED') {
+              syncListeners.forEach(fn => fn(event.data));
+            }
+          };
+          return true;
+        }
+      } catch (e) {
+        console.warn('BroadcastChannel not supported');
+      }
+      return false;
+    }
+
+    function broadcastChange(change) {
+      if (broadcastChannel) {
+        try {
+          broadcastChannel.postMessage({
+            type: 'DATA_CHANGED',
+            timestamp: Date.now(),
+            change: change
+          });
+        } catch (e) {
+          console.warn('Failed to broadcast', e);
+        }
+      }
+    }
+
+    function onSyncChange(fn) {
+      syncListeners.push(fn);
+    }
+
+    // ============================================
     // Database Setup - IndexedDB
     // ============================================
     let db;
     const DB_NAME = 'PulsePartsDB';
-    const DB_VERSION = 1;
+    const DB_VERSION = 2;
 
     function openDB() {
       return new Promise((resolve, reject) => {
@@ -1009,6 +1073,13 @@
             store.createIndex('number', 'number', { unique: false });
             store.createIndex('account', 'account', { unique: false });
             store.createIndex('detail', 'detail', { unique: false });
+          }
+
+          if (!db.objectStoreNames.contains('syncLog')) {
+            db.createObjectStore('syncLog', { 
+              keyPath: 'id', 
+              autoIncrement: true 
+            });
           }
         };
         
@@ -1589,12 +1660,11 @@
         $('docDescription').value = data.description;
       } else {
         updateDetailOptions();
-        $('docDate').value = '';
+        $('docDate').value = getTodayPersian();
         $('docDebit').value = '';
         $('docCredit').value = '';
         $('docDescription').value = '';
         
-        // Get next document number
         const documents = await getAllRecords('documents');
         let maxNumber = 0;
         documents.forEach(d => {
@@ -1639,6 +1709,7 @@
         }
         closeModal('documentModal');
         toast(data.id ? 'سند با موفقیت ویرایش شد' : 'سند با موفقیت ثبت شد');
+        broadcastChange({ type: 'document', action: data.id ? 'update' : 'add', id: data.id });
         await refreshData(true);
       } catch (err) {
         toast(err.message || 'خطا در ذخیره سند', 'error');
@@ -1669,13 +1740,11 @@
       showLoading(true);
       try {
         if (oldName) {
-          // Update account
           const accounts = await getAllRecords('accounts');
           const account = accounts.find(a => a.name === oldName);
           if (account) {
             await updateRecord('accounts', account.id, { name: name });
             
-            // Update related records
             const details = await getAllRecords('details');
             const documents = await getAllRecords('documents');
             
@@ -1693,7 +1762,6 @@
           }
           toast('دفتر معین ویرایش شد');
         } else {
-          // Add new account
           const accounts = await getAllRecords('accounts');
           if (accounts.some(a => a.name === name)) {
             throw new Error('این دفتر معین قبلاً ثبت شده است');
@@ -1702,6 +1770,7 @@
           toast('دفتر معین اضافه شد');
         }
         closeModal('accountModal');
+        broadcastChange({ type: 'account', action: oldName ? 'update' : 'add', name: name });
         await refreshData(true);
       } catch (err) {
         toast(err.message || 'خطا در ذخیره دفتر معین', 'error');
@@ -1744,7 +1813,6 @@
       showLoading(true);
       try {
         if (oldName) {
-          // Update detail
           const details = await getAllRecords('details');
           const detail = details.find(d => 
             d.account === oldAccount && d.name === oldName && d.note === oldNote
@@ -1752,7 +1820,6 @@
           if (detail) {
             await updateRecord('details', detail.id, data);
             
-            // Update documents
             if (oldAccount !== data.account || oldName !== data.name) {
               const documents = await getAllRecords('documents');
               for (const doc of documents) {
@@ -1768,7 +1835,6 @@
           }
           toast('تفصیلی ویرایش شد');
         } else {
-          // Add new detail
           const details = await getAllRecords('details');
           if (details.some(d => d.account === data.account && d.name === data.name)) {
             throw new Error('این تفصیلی قبلاً ثبت شده است');
@@ -1777,6 +1843,7 @@
           toast('تفصیلی اضافه شد');
         }
         closeModal('detailModal');
+        broadcastChange({ type: 'detail', action: oldName ? 'update' : 'add', id: data.id });
         await refreshData(true);
       } catch (err) {
         toast(err.message || 'خطا در ذخیره تفصیلی', 'error');
@@ -1819,6 +1886,7 @@
         if (type === 'document') {
           await deleteRecord('documents', target);
           toast('سند حذف شد');
+          broadcastChange({ type: 'document', action: 'delete', id: target });
         } else if (type === 'account') {
           const name = decodeURIComponent(target);
           const documents = await getAllRecords('documents');
@@ -1831,6 +1899,7 @@
             await deleteRecord('accounts', account.id);
           }
           toast('دفتر معین حذف شد');
+          broadcastChange({ type: 'account', action: 'delete', name: name });
         } else if (type === 'detail') {
           const details = await getAllRecords('details');
           const detail = details.find(d => d.id === target);
@@ -1840,6 +1909,7 @@
           }
           await deleteRecord('details', target);
           toast('تفصیلی حذف شد');
+          broadcastChange({ type: 'detail', action: 'delete', id: target });
         }
         await refreshData(true);
       } catch (err) {
@@ -1938,12 +2008,10 @@
         
         showLoading(true);
         
-        // Clear existing data
         await clearStore('accounts');
         await clearStore('details');
         await clearStore('documents');
         
-        // Import new data
         for (const account of data.accounts) {
           await addRecord('accounts', { name: account.name });
         }
@@ -1968,6 +2036,7 @@
           });
         }
         
+        broadcastChange({ type: 'import', action: 'full' });
         await refreshData(true);
         toast('داده‌ها با موفقیت بازیابی شدند');
       } catch (error) {
@@ -1978,16 +2047,77 @@
       }
     }
 
+    // ============================================
+    // Service Worker Registration
+    // ============================================
+    async function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.register('sw.js', {
+            scope: '/'
+          });
+          console.log('Service Worker registered with scope:', registration.scope);
+          updateSyncStatus(true);
+        } catch (error) {
+          console.warn('Service Worker registration failed:', error);
+          updateSyncStatus(false);
+        }
+      } else {
+        updateSyncStatus(false);
+      }
+    }
+
+    function updateSyncStatus(online) {
+      const el = $('syncStatus');
+      if (!el) return;
+      if (online) {
+        el.textContent = '● آنلاین';
+        el.className = 'sync-status online';
+      } else {
+        el.textContent = '● آفلاین';
+        el.className = 'sync-status offline';
+      }
+    }
+
+    // ============================================
+    // Broadcast Channel Sync Listener
+    // ============================================
+    onSyncChange((event) => {
+      console.log('Sync change received:', event);
+      refreshData(true);
+      toast('تغییرات از دستگاه دیگر همگام‌سازی شد', 'success');
+    });
+
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await openDB();
         updateThemeIcon(document.documentElement.getAttribute('data-theme') || 'dark');
+        
+        // Init Broadcast Channel
+        const bcSupported = initBroadcastChannel();
+        if (bcSupported) {
+          toast('همگام‌سازی بین دستگاه‌ها فعال شد', 'success');
+        }
+        
+        // Register Service Worker
+        await registerServiceWorker();
+        
         await refreshData();
       } catch (error) {
         console.error('Failed to initialize:', error);
         toast('خطا در راه‌اندازی برنامه', 'error');
       }
+    });
+
+    // Listen for online/offline events
+    window.addEventListener('online', () => {
+      updateSyncStatus(true);
+      toast('اتصال به اینترنت برقرار شد', 'success');
+    });
+    window.addEventListener('offline', () => {
+      updateSyncStatus(false);
+      toast('اتصال به اینترنت قطع شد', 'error');
     });
   </script>
 </body>
