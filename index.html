@@ -2,11 +2,11 @@
 <html lang="fa" dir="rtl" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>قطعات یدکی موتور سیکلت پالس - نسخه آفلاین</title>
   <meta name="theme-color" content="#0a0b0d">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="description" content="سیستم حسابداری آفلاین قطعات یدکی موتور سیکلت پالس با قابلیت نصب PWA و همگام‌سازی خودکار.">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
@@ -451,9 +451,6 @@
     @keyframes spin{to{transform:rotate(360deg)}}
 
     .mobile-only{display:none}
-    .sync-status{font-size:10px;color:var(--text-faint);margin-right:8px;padding:3px 10px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);}
-    .sync-status.online{color:var(--green);border-color:var(--green);}
-    .sync-status.offline{color:var(--red);border-color:var(--red);}
 
     @media(max-width:1050px){
       .cards{grid-template-columns:repeat(2,1fr)}
@@ -587,7 +584,6 @@
 
       .toast{top:66px;width:calc(100% - 28px);text-align:center}
       .delete-modal-card{padding:26px 18px}
-      .sync-status{font-size:8px;padding:2px 8px;margin-right:4px}
     }
 
     @media(max-width:390px){
@@ -607,11 +603,10 @@
       <div class="brand-mark">🏍</div>
       <div>
         <div class="brand-title">قطعات یدکی موتور سیکلت پالس</div>
-        <div class="brand-subtitle">سیستم حسابداری آفلاین</div>
+        <div class="brand-subtitle">سیستم حسابداری آفلاین + PWA</div>
       </div>
     </div>
     <div class="top-actions">
-      <span class="sync-status" id="syncStatus">● آفلاین</span>
       <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="تغییر پوسته">☀</button>
       <button class="icon-btn" onclick="exportData()" title="پشتیبان‌گیری">💾</button>
       <button class="icon-btn" onclick="document.getElementById('importFile').click()" title="بازیابی">📂</button>
@@ -844,7 +839,7 @@
             <input id="docNumber" type="text" readonly class="readonly">
           </label>
           <label>
-            <span>تاریخ <small>(متنی)</small></span>
+            <span>تاریخ <small>(شمسی)</small></span>
             <input id="docDate" type="text" placeholder="1405-05-26" autocomplete="off">
           </label>
           <label>
@@ -977,61 +972,35 @@
 
   <script>
     // ============================================
-    // Persian Date Utilities
+    // Persian Calendar (Jalali) utility
     // ============================================
-    function toPersianDate(date) {
-      const d = new Date(date);
-      const jd = d.toLocaleDateString('fa-IR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).replace(/\//g, '-');
-      return jd;
+    function getTodayJalali() {
+      const now = new Date();
+      const gregorian = {
+        y: now.getFullYear(),
+        m: now.getMonth() + 1,
+        d: now.getDate()
+      };
+      return gregorianToJalali(gregorian.y, gregorian.m, gregorian.d);
     }
 
-    function getTodayPersian() {
-      return toPersianDate(new Date());
-    }
-
-    // ============================================
-    // Broadcast Channel for Sync
-    // ============================================
-    let broadcastChannel = null;
-    let syncListeners = [];
-
-    function initBroadcastChannel() {
-      try {
-        if ('BroadcastChannel' in window) {
-          broadcastChannel = new BroadcastChannel('pulse-parts-sync');
-          broadcastChannel.onmessage = (event) => {
-            if (event.data.type === 'DATA_CHANGED') {
-              syncListeners.forEach(fn => fn(event.data));
-            }
-          };
-          return true;
-        }
-      } catch (e) {
-        console.warn('BroadcastChannel not supported');
+    function gregorianToJalali(gy, gm, gd) {
+      const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+      let jy = (gy <= 1600) ? 0 : 979;
+      gy -= (gy <= 1600) ? 621 : 1600;
+      const gy2 = (gm > 2) ? (gy + 1) : gy;
+      let days = (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+      jy += 33 * Math.floor(days / 12053);
+      days %= 12053;
+      jy += 4 * Math.floor(days / 1461);
+      days %= 1461;
+      if (days > 365) {
+        jy += Math.floor((days - 1) / 365);
+        days = (days - 1) % 365;
       }
-      return false;
-    }
-
-    function broadcastChange(change) {
-      if (broadcastChannel) {
-        try {
-          broadcastChannel.postMessage({
-            type: 'DATA_CHANGED',
-            timestamp: Date.now(),
-            change: change
-          });
-        } catch (e) {
-          console.warn('Failed to broadcast', e);
-        }
-      }
-    }
-
-    function onSyncChange(fn) {
-      syncListeners.push(fn);
+      const jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+      const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+      return `${jy}-${String(jm).padStart(2, '0')}-${String(jd).padStart(2, '0')}`;
     }
 
     // ============================================
@@ -1039,7 +1008,7 @@
     // ============================================
     let db;
     const DB_NAME = 'PulsePartsDB';
-    const DB_VERSION = 2;
+    const DB_VERSION = 1;
 
     function openDB() {
       return new Promise((resolve, reject) => {
@@ -1049,37 +1018,22 @@
           const db = event.target.result;
           
           if (!db.objectStoreNames.contains('accounts')) {
-            const store = db.createObjectStore('accounts', { 
-              keyPath: 'id', 
-              autoIncrement: true 
-            });
+            const store = db.createObjectStore('accounts', { keyPath: 'id', autoIncrement: true });
             store.createIndex('name', 'name', { unique: true });
           }
           
           if (!db.objectStoreNames.contains('details')) {
-            const store = db.createObjectStore('details', { 
-              keyPath: 'id', 
-              autoIncrement: true 
-            });
+            const store = db.createObjectStore('details', { keyPath: 'id', autoIncrement: true });
             store.createIndex('account', 'account', { unique: false });
             store.createIndex('name', 'name', { unique: false });
           }
           
           if (!db.objectStoreNames.contains('documents')) {
-            const store = db.createObjectStore('documents', { 
-              keyPath: 'id', 
-              autoIncrement: true 
-            });
+            const store = db.createObjectStore('documents', { keyPath: 'id', autoIncrement: true });
             store.createIndex('number', 'number', { unique: false });
             store.createIndex('account', 'account', { unique: false });
             store.createIndex('detail', 'detail', { unique: false });
-          }
-
-          if (!db.objectStoreNames.contains('syncLog')) {
-            db.createObjectStore('syncLog', { 
-              keyPath: 'id', 
-              autoIncrement: true 
-            });
+            store.createIndex('date', 'date', { unique: false });
           }
         };
         
@@ -1099,7 +1053,6 @@
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
         const request = store.add(data);
-        
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
@@ -1110,7 +1063,6 @@
         const transaction = db.transaction([storeName], 'readonly');
         const store = transaction.objectStore(storeName);
         const request = store.getAll();
-        
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
@@ -1121,7 +1073,6 @@
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
         const request = store.put({ ...data, id: id });
-        
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
@@ -1132,7 +1083,6 @@
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
         const request = store.delete(id);
-        
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
@@ -1143,7 +1093,6 @@
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
         const request = store.clear();
-        
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
@@ -1152,21 +1101,15 @@
     // ============================================
     // Application State
     // ============================================
-    let appData = {
-      accounts: [],
-      details: [],
-      documents: []
-    };
-
+    let appData = { accounts: [], details: [], documents: [] };
     let currentEdit = null;
     let busy = false;
     let deleteTarget = null;
+    let syncChannel = null;
 
     const $ = id => document.getElementById(id);
 
-    function showLoading(show = true) {
-      $('loading').classList.toggle('show', show);
-    }
+    function showLoading(show = true) { $('loading').classList.toggle('show', show); }
 
     function toast(message, type = 'success') {
       const el = $('toast');
@@ -1177,9 +1120,7 @@
     }
 
     function normalizeDigits(value) {
-      return String(value ?? '')
-        .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
-        .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+      return String(value ?? '').replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
     }
 
     function parseMoney(value) {
@@ -1197,9 +1138,7 @@
       input.value = value ? formatMoney(value) : '';
     }
 
-    function moneyClass(value) {
-      return Number(value) >= 0 ? 'positive' : 'negative';
-    }
+    function moneyClass(value) { return Number(value) >= 0 ? 'positive' : 'negative'; }
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -1210,57 +1149,34 @@
       updateThemeIcon(next);
     }
 
-    function updateThemeIcon(theme) {
+    function updateThemeIcon(theme) { 
       const btn = $('themeToggle');
-      if (btn) btn.textContent = theme === 'dark' ? '☀' : '🌙';
+      if (btn) btn.textContent = theme === 'dark' ? '☀' : '🌙'; 
     }
 
-    function rowClass(value) {
-      return Number(value) >= 0 ? 'row-credit' : 'row-debit';
-    }
+    function rowClass(value) { return Number(value) >= 0 ? 'row-credit' : 'row-debit'; }
 
     function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>"']/g, c => ({
-        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
-      }[c]));
+      return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
     }
 
     async function refreshData(silent = false) {
       if (busy) return;
       busy = true;
       if (!silent) showLoading(true);
-
       try {
         const [accounts, details, documents] = await Promise.all([
-          getAllRecords('accounts'),
-          getAllRecords('details'),
-          getAllRecords('documents')
+          getAllRecords('accounts'), getAllRecords('details'), getAllRecords('documents')
         ]);
-        
-        appData = {
-          accounts: accounts.map(a => a.name),
-          details: details,
-          documents: documents
-        };
-        
+        appData = { accounts: accounts.map(a => a.name), details, documents };
         renderAll();
-        $('connectionStatus').textContent = 
-          `آفلاین · ${documents.length} سند · ${accounts.length} معین · ${details.length} تفصیلی`;
-      } catch (err) {
-        console.error(err);
-        toast('خطا در خواندن داده‌ها', 'error');
-      } finally {
-        busy = false;
-        showLoading(false);
-      }
+        $('connectionStatus').textContent = `آفلاین · ${documents.length} سند · ${accounts.length} معین · ${details.length} تفصیلی · همگام‌سازی فعال`;
+      } catch (err) { console.error(err); toast('خطا در خواندن داده‌ها', 'error'); }
+      finally { busy = false; showLoading(false); }
     }
 
     function renderAll() {
-      renderDashboard();
-      renderDocuments();
-      renderAccounts();
-      renderDetails();
-      populateAccountSelects();
+      renderDashboard(); renderDocuments(); renderAccounts(); renderDetails(); populateAccountSelects();
     }
 
     function showPage(page) {
@@ -1273,34 +1189,19 @@
 
     function calculateStats() {
       let debit = 0, credit = 0;
-      appData.documents.forEach(d => {
-        debit += Number(d.debit) || 0;
-        credit += Number(d.credit) || 0;
-      });
+      appData.documents.forEach(d => { debit += Number(d.debit)||0; credit += Number(d.credit)||0; });
       return { debit, credit, balance: debit - credit };
     }
 
     function getAccountStats(name) {
       let debit = 0, credit = 0, count = 0;
-      appData.documents.forEach(d => {
-        if (d.account === name) {
-          debit += Number(d.debit) || 0;
-          credit += Number(d.credit) || 0;
-          count++;
-        }
-      });
+      appData.documents.forEach(d => { if(d.account === name){ debit += Number(d.debit)||0; credit += Number(d.credit)||0; count++; } });
       return { debit, credit, balance: debit - credit, count };
     }
 
     function getDetailStats(account, detail) {
       let debit = 0, credit = 0, count = 0;
-      appData.documents.forEach(d => {
-        if (d.account === account && d.detail === detail) {
-          debit += Number(d.debit) || 0;
-          credit += Number(d.credit) || 0;
-          count++;
-        }
-      });
+      appData.documents.forEach(d => { if(d.account === account && d.detail === detail){ debit += Number(d.debit)||0; credit += Number(d.credit)||0; count++; } });
       return { debit, credit, balance: debit - credit, count };
     }
 
@@ -1319,322 +1220,90 @@
             <strong>${escapeHtml(d.account)}</strong>
             <span>${escapeHtml(d.detail)} · ${escapeHtml(d.date)}</span>
           </div>
-          <div class="recent-amount ${d.debit > 0 ? 'debit' : 'credit'}">
-            ${formatMoney(d.debit || d.credit)}
-            <small>${d.debit > 0 ? 'بدهکار' : 'بستانکار'}</small>
-          </div>
-        </div>
-      `).join('') : emptyState('هنوز سندی ثبت نشده است');
+          <div class="recent-amount ${d.debit > 0 ? 'debit' : 'credit'}">${formatMoney(d.debit || d.credit)}<small>${d.debit > 0 ? 'بدهکار' : 'بستانکار'}</small></div>
+        </div>`).join('') : emptyState('هنوز سندی ثبت نشده است');
 
       $('accountSnapshot').innerHTML = appData.accounts.slice(0, 7).map(a => {
         const s = getAccountStats(a);
-        return `
-          <div class="snapshot-item">
-            <div class="avatar">${escapeHtml(a.substring(0, 1))}</div>
-            <div class="snapshot-main">
-              <strong>${escapeHtml(a)}</strong>
-              <span>${s.count} سند</span>
-            </div>
-            <b class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</b>
-          </div>
-        `;
+        return `<div class="snapshot-item"><div class="avatar">${escapeHtml(a.substring(0,1))}</div><div class="snapshot-main"><strong>${escapeHtml(a)}</strong><span>${s.count} سند</span></div><b class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</b></div>`;
       }).join('') || emptyState('دفتر معینی ثبت نشده است');
     }
 
     function renderDocuments() {
       const q = normalizeDigits($('docSearch')?.value || '').trim().toLowerCase();
-      const filtered = appData.documents.filter(d => {
-        if (!q) return true;
-        return [d.number, d.date, d.account, d.detail, d.description]
-          .some(x => String(x ?? '').toLowerCase().includes(q));
-      });
-
-      let debit = 0, credit = 0;
-      filtered.forEach(d => {
-        debit += Number(d.debit) || 0;
-        credit += Number(d.credit) || 0;
-      });
+      const filtered = appData.documents.filter(d => !q || [d.number, d.date, d.account, d.detail, d.description].some(x => String(x??'').toLowerCase().includes(q)));
+      let debit=0, credit=0;
+      filtered.forEach(d => { debit += Number(d.debit)||0; credit += Number(d.credit)||0; });
       $('docSummary').innerHTML = `
-        <div class="summary-item">
-          <span>تعداد اسناد</span>
-          <strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>جمع بدهکار</span>
-          <strong class="debit">${formatMoney(debit)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>جمع بستانکار</span>
-          <strong class="credit">${formatMoney(credit)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>مانده</span>
-          <strong class="${moneyClass(debit - credit)}">${formatMoney(debit - credit)}</strong>
-        </div>
-      `;
-
+        <div class="summary-item"><span>تعداد اسناد</span><strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong></div>
+        <div class="summary-item"><span>جمع بدهکار</span><strong class="debit">${formatMoney(debit)}</strong></div>
+        <div class="summary-item"><span>جمع بستانکار</span><strong class="credit">${formatMoney(credit)}</strong></div>
+        <div class="summary-item"><span>مانده</span><strong class="${moneyClass(debit-credit)}">${formatMoney(debit-credit)}</strong></div>`;
       $('documentsBody').innerHTML = filtered.length ? filtered.map(d => `
-        <tr class="${d.debit > 0 ? 'row-debit' : 'row-credit'}">
+        <tr class="${d.debit>0?'row-debit':'row-credit'}">
           <td><span class="doc-number">${escapeHtml(d.number)}</span></td>
           <td class="date-cell">${escapeHtml(d.date)}</td>
           <td><b>${escapeHtml(d.account)}</b></td>
           <td>${escapeHtml(d.detail)}</td>
-          <td class="money debit">${d.debit ? formatMoney(d.debit) : '—'}</td>
-          <td class="money credit">${d.credit ? formatMoney(d.credit) : '—'}</td>
+          <td class="money debit">${d.debit?formatMoney(d.debit):'—'}</td>
+          <td class="money credit">${d.credit?formatMoney(d.credit):'—'}</td>
           <td class="description-cell">${escapeHtml(d.description)}</td>
-          <td class="actions">
-            <button class="small-btn edit" onclick="editDocument(${d.id})">✎ ویرایش</button>
-            <button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند شماره ${d.number}')">🗑 حذف</button>
-          </td>
-        </tr>
-      `).join('') : `<tr><td colspan="8">${emptyState('سندی پیدا نشد')}</td></tr>`;
+          <td class="actions"><button class="small-btn edit" onclick="editDocument(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند شماره ${d.number}')">🗑 حذف</button></td>
+        </tr>`).join('') : `<tr><td colspan="8">${emptyState('سندی پیدا نشد')}</td></tr>`;
 
       $('documentsMobile').innerHTML = filtered.length ? filtered.map(d => `
-        <div class="mobile-card ${d.debit > 0 ? 'row-debit' : 'row-credit'}">
-          <div class="mobile-card-header">
-            <span class="mobile-card-title">سند ${escapeHtml(d.number)}</span>
-            <span class="mobile-card-badge">${escapeHtml(d.date)}</span>
-          </div>
+        <div class="mobile-card ${d.debit>0?'row-debit':'row-credit'}">
+          <div class="mobile-card-header"><span class="mobile-card-title">سند ${escapeHtml(d.number)}</span><span class="mobile-card-badge">${escapeHtml(d.date)}</span></div>
           <div class="mobile-card-body">
-            <div class="mobile-card-row">
-              <span class="mobile-card-label">دفتر معین</span>
-              <span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.account)}</span>
-            </div>
-            <div class="mobile-card-row">
-              <span class="mobile-card-label">دفتر تفصیلی</span>
-              <span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.detail)}</span>
-            </div>
-            <div class="mobile-card-amounts">
-              <div class="mobile-card-amount-box is-debit">
-                <span>↑ بدهکار</span>
-                <strong class="debit">${d.debit ? formatMoney(d.debit) : '—'}</strong>
-              </div>
-              <div class="mobile-card-amount-box is-credit">
-                <span>↓ بستانکار</span>
-                <strong class="credit">${d.credit ? formatMoney(d.credit) : '—'}</strong>
-              </div>
-            </div>
-            ${d.description ? `
-            <div class="mobile-card-row">
-              <span class="mobile-card-label">شرح</span>
-              <span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.description)}</span>
-            </div>` : ''}
-            <div class="mobile-card-actions">
-              <button class="small-btn edit" onclick="editDocument(${d.id})">✎ ویرایش</button>
-              <button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند شماره ${d.number}')">🗑 حذف</button>
-            </div>
+            <div class="mobile-card-row"><span class="mobile-card-label">دفتر معین</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.account)}</span></div>
+            <div class="mobile-card-row"><span class="mobile-card-label">دفتر تفصیلی</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.detail)}</span></div>
+            <div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${d.debit?formatMoney(d.debit):'—'}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${d.credit?formatMoney(d.credit):'—'}</strong></div></div>
+            ${d.description?`<div class="mobile-card-row"><span class="mobile-card-label">شرح</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.description)}</span></div>`:''}
+            <div class="mobile-card-actions"><button class="small-btn edit" onclick="editDocument(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند شماره ${d.number}')">🗑 حذف</button></div>
           </div>
-        </div>
-      `).join('') : emptyState('سندی پیدا نشد');
+        </div>`).join('') : emptyState('سندی پیدا نشد');
     }
 
     function renderAccounts() {
       const q = normalizeDigits($('accountSearch')?.value || '').trim().toLowerCase();
-      const totals = appData.accounts
-        .filter(a => !q || a.toLowerCase().includes(q))
-        .map(a => ({name:a, ...getAccountStats(a)}));
-
-      let debit = 0, credit = 0;
-      totals.forEach(a => {
-        debit += a.debit;
-        credit += a.credit;
-      });
-      $('accountSummary').innerHTML = `
-        <div class="summary-item">
-          <span>تعداد معین</span>
-          <strong style="color:var(--blue)">${formatMoney(totals.length)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>جمع بدهکار</span>
-          <strong class="debit">${formatMoney(debit)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>جمع بستانکار</span>
-          <strong class="credit">${formatMoney(credit)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>مانده کل</span>
-          <strong class="${moneyClass(debit - credit)}">${formatMoney(debit - credit)}</strong>
-        </div>
-      `;
-
-      $('accountCards').innerHTML = totals.slice(0, 4).map(a => `
-        <div class="stat-card compact">
-          <div class="stat-icon">◉</div>
-          <div>
-            <span>${escapeHtml(a.name)}</span>
-            <strong>${formatMoney(a.balance)}</strong>
-            <small>${a.count} سند</small>
-          </div>
-        </div>
-      `).join('');
-
-      $('accountsBody').innerHTML = totals.length ? totals.map((a, i) => `
-        <tr class="${rowClass(a.balance)}">
-          <td>${i + 1}</td>
-          <td><b>${escapeHtml(a.name)}</b></td>
-          <td class="money debit">${formatMoney(a.debit)}</td>
-          <td class="money credit">${formatMoney(a.credit)}</td>
-          <td class="money ${moneyClass(a.balance)}">${formatMoney(a.balance)}</td>
-          <td>${formatMoney(a.count)}</td>
-          <td class="actions">
-            <button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button>
-            <button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'دفتر معین «${a.name}»')">🗑 حذف</button>
-          </td>
-        </tr>
-      `).join('') : `<tr><td colspan="7">${emptyState('دفتر معینی ثبت نشده است')}</td></tr>`;
-
-      $('accountsMobile').innerHTML = totals.length ? totals.map((a, i) => `
-        <div class="mobile-card ${rowClass(a.balance)}">
-          <div class="mobile-card-header">
-            <span class="mobile-card-title">${escapeHtml(a.name)}</span>
-            <span class="mobile-card-badge">${a.count} سند</span>
-          </div>
-          <div class="mobile-card-body">
-            <div class="mobile-card-amounts">
-              <div class="mobile-card-amount-box is-debit">
-                <span>↑ بدهکار</span>
-                <strong class="debit">${formatMoney(a.debit)}</strong>
-              </div>
-              <div class="mobile-card-amount-box is-credit">
-                <span>↓ بستانکار</span>
-                <strong class="credit">${formatMoney(a.credit)}</strong>
-              </div>
-            </div>
-            <div class="mobile-card-balance">
-              <span>مانده حساب</span>
-              <strong class="${moneyClass(a.balance)}">${formatMoney(a.balance)}</strong>
-            </div>
-            <div class="mobile-card-actions">
-              <button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button>
-              <button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'دفتر معین «${a.name}»')">🗑 حذف</button>
-            </div>
-          </div>
-        </div>
-      `).join('') : emptyState('دفتر معینی ثبت نشده است');
+      const totals = appData.accounts.filter(a => !q || a.toLowerCase().includes(q)).map(a => ({name:a, ...getAccountStats(a)}));
+      let debit=0, credit=0; totals.forEach(a => { debit += a.debit; credit += a.credit; });
+      $('accountSummary').innerHTML = `<div class="summary-item"><span>تعداد معین</span><strong style="color:var(--blue)">${formatMoney(totals.length)}</strong></div><div class="summary-item"><span>جمع بدهکار</span><strong class="debit">${formatMoney(debit)}</strong></div><div class="summary-item"><span>جمع بستانکار</span><strong class="credit">${formatMoney(credit)}</strong></div><div class="summary-item"><span>مانده کل</span><strong class="${moneyClass(debit-credit)}">${formatMoney(debit-credit)}</strong></div>`;
+      $('accountCards').innerHTML = totals.slice(0,4).map(a => `<div class="stat-card compact"><div class="stat-icon">◉</div><div><span>${escapeHtml(a.name)}</span><strong>${formatMoney(a.balance)}</strong><small>${a.count} سند</small></div></div>`).join('');
+      $('accountsBody').innerHTML = totals.length ? totals.map((a,i)=>`<tr class="${rowClass(a.balance)}"><td>${i+1}</td><td><b>${escapeHtml(a.name)}</b></td><td class="money debit">${formatMoney(a.debit)}</td><td class="money credit">${formatMoney(a.credit)}</td><td class="money ${moneyClass(a.balance)}">${formatMoney(a.balance)}</td><td>${formatMoney(a.count)}</td><td class="actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'دفتر معین «${a.name}»')">🗑 حذف</button></td></tr>`).join('') : `<tr><td colspan="7">${emptyState('دفتر معینی ثبت نشده است')}</td></tr>`;
+      $('accountsMobile').innerHTML = totals.length ? totals.map((a,i)=>`<div class="mobile-card ${rowClass(a.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(a.name)}</span><span class="mobile-card-badge">${a.count} سند</span></div><div class="mobile-card-body"><div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${formatMoney(a.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${formatMoney(a.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده حساب</span><strong class="${moneyClass(a.balance)}">${formatMoney(a.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'دفتر معین «${a.name}»')">🗑 حذف</button></div></div></div>`).join('') : emptyState('دفتر معینی ثبت نشده است');
     }
 
     function renderDetails() {
       const q = normalizeDigits($('detailSearch')?.value || '').trim().toLowerCase();
-      const filtered = appData.details.filter(d => {
-        if (!q) return true;
-        return [d.account, d.name, d.note].some(x => String(x ?? '').toLowerCase().includes(q));
-      });
-
-      let debit = 0, credit = 0;
-      filtered.forEach(d => {
-        const s = getDetailStats(d.account, d.name);
-        debit += s.debit;
-        credit += s.credit;
-      });
-      $('detailSummary').innerHTML = `
-        <div class="summary-item">
-          <span>تعداد تفصیلی</span>
-          <strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>جمع بدهکار</span>
-          <strong class="debit">${formatMoney(debit)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>جمع بستانکار</span>
-          <strong class="credit">${formatMoney(credit)}</strong>
-        </div>
-        <div class="summary-item">
-          <span>مانده کل</span>
-          <strong class="${moneyClass(debit - credit)}">${formatMoney(debit - credit)}</strong>
-        </div>
-      `;
-
-      $('detailsBody').innerHTML = filtered.length ? filtered.map((d, i) => {
-        const s = getDetailStats(d.account, d.name);
-        return `
-          <tr class="${rowClass(s.balance)}">
-            <td>${i + 1}</td>
-            <td><b>${escapeHtml(d.account)}</b></td>
-            <td>${escapeHtml(d.name)}</td>
-            <td>${escapeHtml(d.note)}</td>
-            <td class="money debit">${formatMoney(s.debit)}</td>
-            <td class="money credit">${formatMoney(s.credit)}</td>
-            <td class="money ${moneyClass(s.balance)}">${formatMoney(s.balance)}</td>
-            <td class="actions">
-              <button class="small-btn edit" onclick="editDetail(${d.id})">✎ ویرایش</button>
-              <button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑 حذف</button>
-            </td>
-          </tr>
-        `;
-      }).join('') : `<tr><td colspan="8">${emptyState('تفصیلی ثبت نشده است')}</td></tr>`;
-
-      $('detailsMobile').innerHTML = filtered.length ? filtered.map((d, i) => {
-        const s = getDetailStats(d.account, d.name);
-        return `
-          <div class="mobile-card ${rowClass(s.balance)}">
-            <div class="mobile-card-header">
-              <span class="mobile-card-title">${escapeHtml(d.name)}</span>
-              <span class="mobile-card-badge">${escapeHtml(d.account)}</span>
-            </div>
-            <div class="mobile-card-body">
-              ${d.note ? `
-              <div class="mobile-card-row">
-                <span class="mobile-card-label">ملاحظات</span>
-                <span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.note)}</span>
-              </div>` : ''}
-              <div class="mobile-card-amounts">
-                <div class="mobile-card-amount-box is-debit">
-                  <span>↑ بدهکار</span>
-                  <strong class="debit">${formatMoney(s.debit)}</strong>
-                </div>
-                <div class="mobile-card-amount-box is-credit">
-                  <span>↓ بستانکار</span>
-                  <strong class="credit">${formatMoney(s.credit)}</strong>
-                </div>
-              </div>
-              <div class="mobile-card-balance">
-                <span>مانده تفصیلی</span>
-                <strong class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</strong>
-              </div>
-              <div class="mobile-card-actions">
-                <button class="small-btn edit" onclick="editDetail(${d.id})">✎ ویرایش</button>
-                <button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑 حذف</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('') : emptyState('تفصیلی ثبت نشده است');
+      const filtered = appData.details.filter(d => !q || [d.account, d.name, d.note].some(x=>String(x??'').toLowerCase().includes(q)));
+      let debit=0, credit=0; filtered.forEach(d => { const s = getDetailStats(d.account, d.name); debit += s.debit; credit += s.credit; });
+      $('detailSummary').innerHTML = `<div class="summary-item"><span>تعداد تفصیلی</span><strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong></div><div class="summary-item"><span>جمع بدهکار</span><strong class="debit">${formatMoney(debit)}</strong></div><div class="summary-item"><span>جمع بستانکار</span><strong class="credit">${formatMoney(credit)}</strong></div><div class="summary-item"><span>مانده کل</span><strong class="${moneyClass(debit-credit)}">${formatMoney(debit-credit)}</strong></div>`;
+      $('detailsBody').innerHTML = filtered.length ? filtered.map((d,i)=>{ const s = getDetailStats(d.account,d.name); return `<tr class="${rowClass(s.balance)}"><td>${i+1}</td><td><b>${escapeHtml(d.account)}</b></td><td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.note)}</td><td class="money debit">${formatMoney(s.debit)}</td><td class="money credit">${formatMoney(s.credit)}</td><td class="money ${moneyClass(s.balance)}">${formatMoney(s.balance)}</td><td class="actions"><button class="small-btn edit" onclick="editDetail(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑 حذف</button></td></tr>`; }).join('') : `<tr><td colspan="8">${emptyState('تفصیلی ثبت نشده است')}</td></tr>`;
+      $('detailsMobile').innerHTML = filtered.length ? filtered.map((d,i)=>{ const s = getDetailStats(d.account,d.name); return `<div class="mobile-card ${rowClass(s.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(d.name)}</span><span class="mobile-card-badge">${escapeHtml(d.account)}</span></div><div class="mobile-card-body">${d.note?`<div class="mobile-card-row"><span class="mobile-card-label">ملاحظات</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.note)}</span></div>`:''}<div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${formatMoney(s.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${formatMoney(s.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده تفصیلی</span><strong class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editDetail(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑 حذف</button></div></div></div>`; }).join('') : emptyState('تفصیلی ثبت نشده است');
     }
 
-    function emptyState(text) {
-      return `<div class="empty-state"><div>⌁</div><span>${text}</span></div>`;
-    }
+    function emptyState(text){ return `<div class="empty-state"><div>⌁</div><span>${text}</span></div>`; }
 
     function populateAccountSelects() {
-      const accountOptions = '<option value="">انتخاب دفتر معین</option>' +
-        appData.accounts.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
+      const accountOptions = '<option value="">انتخاب دفتر معین</option>' + appData.accounts.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
       $('docAccount').innerHTML = accountOptions;
       $('detailAccount').innerHTML = accountOptions;
       updateDetailOptions();
     }
 
-    function updateDetailOptions(selected = '') {
+    function updateDetailOptions(selected='') {
       const account = $('docAccount').value;
       const list = appData.details.filter(d => d.account === account);
-      $('docDetail').innerHTML = '<option value="">انتخاب دفتر تفصیلی</option>' +
-        list.map(d => `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)}</option>`).join('');
-      if (selected) $('docDetail').value = selected;
+      $('docDetail').innerHTML = '<option value="">انتخاب دفتر تفصیلی</option>' + list.map(d => `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)}</option>`).join('');
+      if(selected) $('docDetail').value = selected;
     }
 
-    function onAccountChange() {
-      updateDetailOptions();
-      updateSelectedBalances();
-    }
+    function onAccountChange(){ updateDetailOptions(); updateSelectedBalances(); }
+    function onDetailChange(){ updateSelectedBalances(); }
 
-    function onDetailChange() {
-      updateSelectedBalances();
-    }
-
-    function updateSelectedBalances() {
-      const account = $('docAccount').value;
-      const detail = $('docDetail').value;
+    function updateSelectedBalances(){
+      const account = $('docAccount').value, detail = $('docDetail').value;
       const a = account ? getAccountStats(account) : {balance:0};
       const d = account && detail ? getDetailStats(account, detail) : {balance:0};
       $('selectedAccountBalance').textContent = formatMoney(a.balance);
@@ -1643,7 +1312,7 @@
       $('selectedDetailBalance').className = moneyClass(d.balance);
     }
 
-    async function openDocumentForm(data = null) {
+    async function openDocumentForm(data=null) {
       currentEdit = data ? {type:'document', id:data.id} : null;
       $('documentForm').reset();
       $('docRow').value = data ? data.id : '';
@@ -1651,7 +1320,7 @@
       $('documentSaveBtn').textContent = data ? 'ذخیره تغییرات' : 'ثبت سند';
       $('docNumber').value = data ? data.number : 'در حال دریافت...';
 
-      if (data) {
+      if(data) {
         $('docDate').value = data.date;
         $('docAccount').value = data.account;
         updateDetailOptions(data.detail);
@@ -1660,17 +1329,12 @@
         $('docDescription').value = data.description;
       } else {
         updateDetailOptions();
-        $('docDate').value = getTodayPersian();
-        $('docDebit').value = '';
-        $('docCredit').value = '';
-        $('docDescription').value = '';
-        
+        // ✅ تاریخ شمسی خودکار
+        $('docDate').value = getTodayJalali();
+        $('docDebit').value = ''; $('docCredit').value = ''; $('docDescription').value = '';
         const documents = await getAllRecords('documents');
         let maxNumber = 0;
-        documents.forEach(d => {
-          const n = parseInt(d.number);
-          if (n > maxNumber) maxNumber = n;
-        });
+        documents.forEach(d => { const n = parseInt(d.number); if(n > maxNumber) maxNumber = n; });
         $('docNumber').value = String(maxNumber + 1);
       }
       updateSelectedBalances();
@@ -1678,446 +1342,184 @@
       setTimeout(() => $('docDate').focus(), 150);
     }
 
-    async function saveDocument(e) {
+    async function saveDocument(e){
       e.preventDefault();
-
-      const debit = parseMoney($('docDebit').value);
-      const credit = parseMoney($('docCredit').value);
-      const data = {
-        id: Number($('docRow').value) || 0,
-        number: $('docNumber').value,
-        date: $('docDate').value.trim(),
-        account: $('docAccount').value,
-        detail: $('docDetail').value,
-        debit,
-        credit,
-        description: $('docDescription').value.trim()
-      };
-
-      if (!data.date) return toast('تاریخ را وارد کنید', 'error');
-      if (!data.account) return toast('دفتر معین را انتخاب کنید', 'error');
-      if (!data.detail) return toast('دفتر تفصیلی را انتخاب کنید', 'error');
-      if (debit === 0 && credit === 0) return toast('حداقل یکی از بدهکار یا بستانکار را وارد کنید', 'error');
-      if (debit > 0 && credit > 0) return toast('در یک سند همزمان بدهکار و بستانکار را وارد نکنید', 'error');
-
+      const debit = parseMoney($('docDebit').value), credit = parseMoney($('docCredit').value);
+      const data = { id: Number($('docRow').value)||0, number: $('docNumber').value, date: $('docDate').value.trim(), account: $('docAccount').value, detail: $('docDetail').value, debit, credit, description: $('docDescription').value.trim() };
+      if(!data.date) return toast('تاریخ را وارد کنید', 'error');
+      if(!data.account) return toast('دفتر معین را انتخاب کنید', 'error');
+      if(!data.detail) return toast('دفتر تفصیلی را انتخاب کنید', 'error');
+      if(debit === 0 && credit === 0) return toast('حداقل یکی از بدهکار یا بستانکار را وارد کنید', 'error');
+      if(debit > 0 && credit > 0) return toast('در یک سند همزمان بدهکار و بستانکار را وارد نکنید', 'error');
       setBusyButton('documentSaveBtn', true);
       try {
-        if (data.id) {
-          await updateRecord('documents', data.id, data);
-        } else {
-          await addRecord('documents', data);
-        }
-        closeModal('documentModal');
-        toast(data.id ? 'سند با موفقیت ویرایش شد' : 'سند با موفقیت ثبت شد');
-        broadcastChange({ type: 'document', action: data.id ? 'update' : 'add', id: data.id });
+        if(data.id){ await updateRecord('documents', data.id, data); } else { await addRecord('documents', data); }
+        closeModal('documentModal'); toast(data.id ? 'سند ویرایش شد' : 'سند ثبت شد');
+        broadcastSync({type:'documents'});
         await refreshData(true);
-      } catch (err) {
-        toast(err.message || 'خطا در ذخیره سند', 'error');
-      } finally {
-        setBusyButton('documentSaveBtn', false);
-      }
+      } catch(err){ toast(err.message || 'خطا در ذخیره سند', 'error'); }
+      finally{ setBusyButton('documentSaveBtn', false); }
     }
 
-    function editDocument(id) {
-      const d = appData.documents.find(x => Number(x.id) === Number(id));
-      if (d) openDocumentForm(d);
-    }
+    function editDocument(id){ const d = appData.documents.find(x=>Number(x.id)===Number(id)); if(d) openDocumentForm(d); }
 
-    function openAccountForm(name = '') {
+    function openAccountForm(name=''){
       $('accountModalTitle').textContent = name ? 'ویرایش دفتر معین' : 'دفتر معین جدید';
-      $('accountOldName').value = name;
-      $('accountName').value = name;
-      openModal('accountModal');
-      setTimeout(() => $('accountName').focus(), 150);
+      $('accountOldName').value = name; $('accountName').value = name;
+      openModal('accountModal'); setTimeout(()=>$('accountName').focus(),150);
     }
 
-    async function saveAccount(e) {
+    async function saveAccount(e){
       e.preventDefault();
-      const oldName = $('accountOldName').value;
-      const name = $('accountName').value.trim();
-      if (!name) return;
-
+      const oldName = $('accountOldName').value, name = $('accountName').value.trim();
+      if(!name) return;
       showLoading(true);
-      try {
-        if (oldName) {
-          const accounts = await getAllRecords('accounts');
-          const account = accounts.find(a => a.name === oldName);
-          if (account) {
-            await updateRecord('accounts', account.id, { name: name });
-            
-            const details = await getAllRecords('details');
-            const documents = await getAllRecords('documents');
-            
-            for (const detail of details) {
-              if (detail.account === oldName) {
-                await updateRecord('details', detail.id, { ...detail, account: name });
-              }
-            }
-            
-            for (const doc of documents) {
-              if (doc.account === oldName) {
-                await updateRecord('documents', doc.id, { ...doc, account: name });
-              }
-            }
+      try{
+        if(oldName){
+          const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===oldName);
+          if(account){ await updateRecord('accounts', account.id, {name}); 
+            const details = await getAllRecords('details'); const documents = await getAllRecords('documents');
+            for(const detail of details){ if(detail.account===oldName){ await updateRecord('details', detail.id, {...detail, account:name}); } }
+            for(const doc of documents){ if(doc.account===oldName){ await updateRecord('documents', doc.id, {...doc, account:name}); } }
           }
           toast('دفتر معین ویرایش شد');
         } else {
-          const accounts = await getAllRecords('accounts');
-          if (accounts.some(a => a.name === name)) {
-            throw new Error('این دفتر معین قبلاً ثبت شده است');
-          }
-          await addRecord('accounts', { name: name });
-          toast('دفتر معین اضافه شد');
+          const accounts = await getAllRecords('accounts'); if(accounts.some(a=>a.name===name)) throw new Error('این دفتر معین قبلاً ثبت شده است');
+          await addRecord('accounts', {name}); toast('دفتر معین اضافه شد');
         }
-        closeModal('accountModal');
-        broadcastChange({ type: 'account', action: oldName ? 'update' : 'add', name: name });
-        await refreshData(true);
-      } catch (err) {
-        toast(err.message || 'خطا در ذخیره دفتر معین', 'error');
-      } finally {
-        showLoading(false);
-      }
+        closeModal('accountModal'); broadcastSync({type:'accounts'}); await refreshData(true);
+      } catch(err){ toast(err.message || 'خطا در ذخیره دفتر معین','error'); } finally{ showLoading(false); }
     }
 
-    function editAccount(encoded) {
-      openAccountForm(decodeURIComponent(encoded));
-    }
+    function editAccount(encoded){ openAccountForm(decodeURIComponent(encoded)); }
 
-    function openDetailForm(data = null) {
+    function openDetailForm(data=null){
       $('detailModalTitle').textContent = data ? 'ویرایش تفصیلی' : 'تفصیلی جدید';
-      $('detailOldAccount').value = data ? data.account : '';
-      $('detailOldName').value = data ? data.name : '';
-      $('detailOldNote').value = data ? data.note : '';
-      $('detailAccount').value = data ? data.account : '';
-      $('detailName').value = data ? data.name : '';
-      $('detailNote').value = data ? data.note : '';
-      openModal('detailModal');
-      setTimeout(() => $('detailName').focus(), 150);
+      $('detailOldAccount').value = data ? data.account : ''; $('detailOldName').value = data ? data.name : ''; $('detailOldNote').value = data ? data.note : '';
+      $('detailAccount').value = data ? data.account : ''; $('detailName').value = data ? data.name : ''; $('detailNote').value = data ? data.note : '';
+      openModal('detailModal'); setTimeout(()=>$('detailName').focus(),150);
     }
 
-    async function saveDetail(e) {
+    async function saveDetail(e){
       e.preventDefault();
-      const oldAccount = $('detailOldAccount').value;
-      const oldName = $('detailOldName').value;
-      const oldNote = $('detailOldNote').value;
-
-      const data = {
-        account: $('detailAccount').value,
-        name: $('detailName').value.trim(),
-        note: $('detailNote').value.trim()
-      };
-
-      if (!data.account) return toast('دفتر معین را انتخاب کنید', 'error');
-      if (!data.name) return toast('نام تفصیلی را وارد کنید', 'error');
-
+      const oldAccount = $('detailOldAccount').value, oldName = $('detailOldName').value, oldNote = $('detailOldNote').value;
+      const data = { account: $('detailAccount').value, name: $('detailName').value.trim(), note: $('detailNote').value.trim() };
+      if(!data.account) return toast('دفتر معین را انتخاب کنید','error');
+      if(!data.name) return toast('نام تفصیلی را وارد کنید','error');
       showLoading(true);
-      try {
-        if (oldName) {
-          const details = await getAllRecords('details');
-          const detail = details.find(d => 
-            d.account === oldAccount && d.name === oldName && d.note === oldNote
-          );
-          if (detail) {
-            await updateRecord('details', detail.id, data);
-            
-            if (oldAccount !== data.account || oldName !== data.name) {
-              const documents = await getAllRecords('documents');
-              for (const doc of documents) {
-                if (doc.account === oldAccount && doc.detail === oldName) {
-                  await updateRecord('documents', doc.id, {
-                    ...doc,
-                    account: data.account,
-                    detail: data.name
-                  });
-                }
-              }
-            }
-          }
+      try{
+        if(oldName){
+          const details = await getAllRecords('details'); const detail = details.find(d=>d.account===oldAccount && d.name===oldName && d.note===oldNote);
+          if(detail){ await updateRecord('details', detail.id, data); if(oldAccount!==data.account || oldName!==data.name){ const documents = await getAllRecords('documents'); for(const doc of documents){ if(doc.account===oldAccount && doc.detail===oldName){ await updateRecord('documents', doc.id, {...doc, account:data.account, detail:data.name}); } } } }
           toast('تفصیلی ویرایش شد');
         } else {
-          const details = await getAllRecords('details');
-          if (details.some(d => d.account === data.account && d.name === data.name)) {
-            throw new Error('این تفصیلی قبلاً ثبت شده است');
-          }
-          await addRecord('details', data);
-          toast('تفصیلی اضافه شد');
+          const details = await getAllRecords('details'); if(details.some(d=>d.account===data.account && d.name===data.name)) throw new Error('این تفصیلی قبلاً ثبت شده است');
+          await addRecord('details', data); toast('تفصیلی اضافه شد');
         }
-        closeModal('detailModal');
-        broadcastChange({ type: 'detail', action: oldName ? 'update' : 'add', id: data.id });
-        await refreshData(true);
-      } catch (err) {
-        toast(err.message || 'خطا در ذخیره تفصیلی', 'error');
-      } finally {
-        showLoading(false);
-      }
+        closeModal('detailModal'); broadcastSync({type:'details'}); await refreshData(true);
+      } catch(err){ toast(err.message || 'خطا در ذخیره تفصیلی','error'); } finally{ showLoading(false); }
     }
 
-    function editDetail(id) {
-      const d = appData.details.find(x => Number(x.id) === Number(id));
-      if (d) openDetailForm(d);
-    }
+    function editDetail(id){ const d = appData.details.find(x=>Number(x.id)===Number(id)); if(d) openDetailForm(d); }
 
-    function showDeleteModal(type, target, title) {
-      deleteTarget = {type, target};
-      $('deleteTitle').textContent = title;
-
-      if (type === 'document') {
-        const d = appData.documents.find(x => Number(x.id) === Number(target));
-        $('deleteMessage').textContent = `آیا از حذف سند شماره ${d.number} مطمئن هستید؟ این عمل قابل بازگشت نیست.`;
-      } else if (type === 'account') {
-        const name = decodeURIComponent(target);
-        $('deleteMessage').textContent = `آیا از حذف دفتر معین «${name}» مطمئن هستید؟`;
-      } else if (type === 'detail') {
-        const d = appData.details.find(x => Number(x.id) === Number(target));
-        $('deleteMessage').textContent = `آیا از حذف تفصیلی «${d.name}» مطمئن هستید؟`;
-      }
-
+    function showDeleteModal(type, target, title){
+      deleteTarget = {type, target}; $('deleteTitle').textContent = title;
+      if(type === 'document'){ const d = appData.documents.find(x=>Number(x.id)===Number(target)); $('deleteMessage').textContent = `آیا از حذف سند شماره ${d.number} مطمئن هستید؟ این عمل قابل بازگشت نیست.`; }
+      else if(type === 'account'){ const name = decodeURIComponent(target); $('deleteMessage').textContent = `آیا از حذف دفتر معین «${name}» مطمئن هستید؟`; }
+      else if(type === 'detail'){ const d = appData.details.find(x=>Number(x.id)===Number(target)); $('deleteMessage').textContent = `آیا از حذف تفصیلی «${d.name}» مطمئن هستید؟`; }
       openModal('deleteModal');
     }
 
-    async function confirmDelete() {
-      if (!deleteTarget) return;
-
-      const {type, target} = deleteTarget;
-      closeModal('deleteModal');
-      showLoading(true);
-
-      try {
-        if (type === 'document') {
-          await deleteRecord('documents', target);
-          toast('سند حذف شد');
-          broadcastChange({ type: 'document', action: 'delete', id: target });
-        } else if (type === 'account') {
-          const name = decodeURIComponent(target);
-          const documents = await getAllRecords('documents');
-          if (documents.some(d => d.account === name)) {
-            throw new Error('این دفتر معین دارای سند است و حذف نمی‌شود');
-          }
-          const accounts = await getAllRecords('accounts');
-          const account = accounts.find(a => a.name === name);
-          if (account) {
-            await deleteRecord('accounts', account.id);
-          }
-          toast('دفتر معین حذف شد');
-          broadcastChange({ type: 'account', action: 'delete', name: name });
-        } else if (type === 'detail') {
-          const details = await getAllRecords('details');
-          const detail = details.find(d => d.id === target);
-          const documents = await getAllRecords('documents');
-          if (documents.some(d => d.account === detail.account && d.detail === detail.name)) {
-            throw new Error('این تفصیلی دارای سند است و حذف نمی‌شود');
-          }
-          await deleteRecord('details', target);
-          toast('تفصیلی حذف شد');
-          broadcastChange({ type: 'detail', action: 'delete', id: target });
-        }
-        await refreshData(true);
-      } catch (err) {
-        toast(err.message || 'خطا در حذف', 'error');
-      } finally {
-        showLoading(false);
-        deleteTarget = null;
-      }
+    async function confirmDelete(){
+      if(!deleteTarget) return;
+      const {type, target} = deleteTarget; closeModal('deleteModal'); showLoading(true);
+      try{
+        if(type === 'document'){ await deleteRecord('documents', target); toast('سند حذف شد'); }
+        else if(type === 'account'){ const name = decodeURIComponent(target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===name)) throw new Error('این دفتر معین دارای سند است'); const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===name); if(account) await deleteRecord('accounts', account.id); toast('دفتر معین حذف شد'); }
+        else if(type === 'detail'){ const details = await getAllRecords('details'); const detail = details.find(d=>d.id===target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===detail.account && d.detail===detail.name)) throw new Error('این تفصیلی دارای سند است'); await deleteRecord('details', target); toast('تفصیلی حذف شد'); }
+        broadcastSync({type:'documents'}); await refreshData(true);
+      } catch(err){ toast(err.message || 'خطا در حذف','error'); } finally{ showLoading(false); deleteTarget = null; }
     }
 
-    function openModal(id) {
-      $(id).classList.add('show');
-      document.body.classList.add('modal-open');
-    }
+    function openModal(id){ $(id).classList.add('show'); document.body.classList.add('modal-open'); }
+    function closeModal(id){ $(id).classList.remove('show'); document.body.classList.remove('modal-open'); }
 
-    function closeModal(id) {
-      $(id).classList.remove('show');
-      document.body.classList.remove('modal-open');
-    }
+    document.querySelectorAll('.modal').forEach(modal => modal.addEventListener('click', e => { if(e.target === modal) closeModal(modal.id); }));
 
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', e => {
-        if (e.target === modal) closeModal(modal.id);
+    function clearDocumentSearch(){ $('docSearch').value=''; renderDocuments(); }
+    function clearAccountSearch(){ $('accountSearch').value=''; renderAccounts(); }
+    function clearDetailSearch(){ $('detailSearch').value=''; renderDetails(); }
+
+    function setBusyButton(id, busy){ const btn = $(id); if(!btn) return; btn.disabled = busy; if(!btn.dataset.oldText) btn.dataset.oldText = btn.textContent; btn.textContent = busy ? 'در حال ذخیره...' : btn.dataset.oldText; }
+
+    window.addEventListener('keydown', e => { if(e.key === 'Escape') document.querySelectorAll('.modal.show').forEach(m => closeModal(m.id)); });
+
+    // ============================================
+    // PWA: Service Worker Registration
+    // ============================================
+    if('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW registration failed:', err));
       });
-    });
-
-    function clearDocumentSearch() {
-      $('docSearch').value = '';
-      renderDocuments();
     }
 
-    function clearAccountSearch() {
-      $('accountSearch').value = '';
-      renderAccounts();
-    }
-
-    function clearDetailSearch() {
-      $('detailSearch').value = '';
-      renderDetails();
-    }
-
-    function setBusyButton(id, busy) {
-      const btn = $(id);
-      if (!btn) return;
-      btn.disabled = busy;
-      btn.dataset.oldText ??= btn.textContent;
-      btn.textContent = busy ? 'در حال ذخیره...' : btn.dataset.oldText;
-    }
-
-    window.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        document.querySelectorAll('.modal.show').forEach(m => closeModal(m.id));
-      }
-    });
-
-    // Export/Import functions
-    async function exportData() {
+    // ============================================
+    // Multi-device sync (BroadcastChannel + storage event)
+    // ============================================
+    function broadcastSync(payload) {
       try {
-        const data = {
-          version: 1,
-          exportedAt: new Date().toISOString(),
-          accounts: await getAllRecords('accounts'),
-          details: await getAllRecords('details'),
-          documents: await getAllRecords('documents')
+        if (!syncChannel) syncChannel = new BroadcastChannel('pulse_sync_channel');
+        syncChannel.postMessage({ ...payload, timestamp: Date.now() });
+      } catch(e) {}
+    }
+
+    function initSyncListener() {
+      if('BroadcastChannel' in window) {
+        syncChannel = new BroadcastChannel('pulse_sync_channel');
+        syncChannel.onmessage = (event) => {
+          console.log('Sync message received:', event.data);
+          refreshData(true);
         };
-        
-        const blob = new Blob([JSON.stringify(data, null, 2)], { 
-          type: 'application/json' 
-        });
-        
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `pulse-parts-backup-${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
+      }
+      window.addEventListener('storage', (e) => {
+        if(e.key && e.key.startsWith('pulse_sync_')) refreshData(true);
+      });
+    }
+
+    // Export/Import
+    async function exportData(){
+      try{
+        const data = { version:1, exportedAt:new Date().toISOString(), accounts:await getAllRecords('accounts'), details:await getAllRecords('details'), documents:await getAllRecords('documents') };
+        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`pulse-parts-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url);
         toast('پشتیبان‌گیری با موفقیت انجام شد');
-      } catch (error) {
-        toast('خطا در پشتیبان‌گیری', 'error');
-      }
+      } catch(error){ toast('خطا در پشتیبان‌گیری','error'); }
     }
 
-    async function importData(file) {
-      if (!file) return;
-      
-      try {
-        const text = await file.text();
-        const data = JSON.parse(text);
-        
-        if (!data.accounts || !data.details || !data.documents) {
-          throw new Error('فایل پشتیبان نامعتبر است');
-        }
-        
-        if (!confirm('داده‌های موجود پاک می‌شوند. ادامه می‌دهید؟')) return;
-        
+    async function importData(file){
+      if(!file) return;
+      try{
+        const text = await file.text(); const data = JSON.parse(text);
+        if(!data.accounts || !data.details || !data.documents) throw new Error('فایل پشتیبان نامعتبر است');
+        if(!confirm('داده‌های موجود پاک می‌شوند. ادامه می‌دهید؟')) return;
         showLoading(true);
-        
-        await clearStore('accounts');
-        await clearStore('details');
-        await clearStore('documents');
-        
-        for (const account of data.accounts) {
-          await addRecord('accounts', { name: account.name });
-        }
-        
-        for (const detail of data.details) {
-          await addRecord('details', {
-            account: detail.account,
-            name: detail.name,
-            note: detail.note || ''
-          });
-        }
-        
-        for (const doc of data.documents) {
-          await addRecord('documents', {
-            number: doc.number,
-            date: doc.date,
-            account: doc.account,
-            detail: doc.detail,
-            debit: doc.debit,
-            credit: doc.credit,
-            description: doc.description || ''
-          });
-        }
-        
-        broadcastChange({ type: 'import', action: 'full' });
-        await refreshData(true);
-        toast('داده‌ها با موفقیت بازیابی شدند');
-      } catch (error) {
-        toast('خطا در بازیابی داده‌ها: ' + error.message, 'error');
-      } finally {
-        showLoading(false);
-        $('importFile').value = '';
-      }
+        await clearStore('accounts'); await clearStore('details'); await clearStore('documents');
+        for(const account of data.accounts){ await addRecord('accounts', {name:account.name}); }
+        for(const detail of data.details){ await addRecord('details', {account:detail.account, name:detail.name, note:detail.note||''}); }
+        for(const doc of data.documents){ await addRecord('documents', {number:doc.number, date:doc.date, account:doc.account, detail:doc.detail, debit:doc.debit, credit:doc.credit, description:doc.description||''}); }
+        broadcastSync({type:'import'}); await refreshData(true); toast('داده‌ها با موفقیت بازیابی شدند');
+      } catch(error){ toast('خطا در بازیابی داده‌ها: '+error.message,'error'); }
+      finally{ showLoading(false); $('importFile').value=''; }
     }
-
-    // ============================================
-    // Service Worker Registration
-    // ============================================
-    async function registerServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        try {
-          const registration = await navigator.serviceWorker.register('sw.js', {
-            scope: '/'
-          });
-          console.log('Service Worker registered with scope:', registration.scope);
-          updateSyncStatus(true);
-        } catch (error) {
-          console.warn('Service Worker registration failed:', error);
-          updateSyncStatus(false);
-        }
-      } else {
-        updateSyncStatus(false);
-      }
-    }
-
-    function updateSyncStatus(online) {
-      const el = $('syncStatus');
-      if (!el) return;
-      if (online) {
-        el.textContent = '● آنلاین';
-        el.className = 'sync-status online';
-      } else {
-        el.textContent = '● آفلاین';
-        el.className = 'sync-status offline';
-      }
-    }
-
-    // ============================================
-    // Broadcast Channel Sync Listener
-    // ============================================
-    onSyncChange((event) => {
-      console.log('Sync change received:', event);
-      refreshData(true);
-      toast('تغییرات از دستگاه دیگر همگام‌سازی شد', 'success');
-    });
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
-      try {
+      try{
         await openDB();
         updateThemeIcon(document.documentElement.getAttribute('data-theme') || 'dark');
-        
-        // Init Broadcast Channel
-        const bcSupported = initBroadcastChannel();
-        if (bcSupported) {
-          toast('همگام‌سازی بین دستگاه‌ها فعال شد', 'success');
-        }
-        
-        // Register Service Worker
-        await registerServiceWorker();
-        
         await refreshData();
-      } catch (error) {
-        console.error('Failed to initialize:', error);
-        toast('خطا در راه‌اندازی برنامه', 'error');
-      }
-    });
-
-    // Listen for online/offline events
-    window.addEventListener('online', () => {
-      updateSyncStatus(true);
-      toast('اتصال به اینترنت برقرار شد', 'success');
-    });
-    window.addEventListener('offline', () => {
-      updateSyncStatus(false);
-      toast('اتصال به اینترنت قطع شد', 'error');
+        initSyncListener();
+      } catch(error){ console.error('Failed to initialize:', error); toast('خطا در راه‌اندازی برنامه','error'); }
     });
   </script>
 </body>
