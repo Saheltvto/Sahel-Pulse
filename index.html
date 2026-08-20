@@ -5,17 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>قطعات یدکی موتور سیکلت پالس</title>
   <meta name="theme-color" content="#f6f4ef">
-  <meta name="description" content="سیستم حسابداری خصوصی قطعات یدکی موتور سیکلت پالس">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="پالس">
-  
-  <!-- Manifest به صورت inline -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"قطعات یدکی موتور سیکلت پالس","short_name":"پالس","description":"سیستم حسابداری خصوصی","start_url":".","display":"standalone","background_color":"%23f6f4ef","theme_color":"%23f6f4ef","orientation":"portrait","dir":"rtl","lang":"fa","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%23d98c4a%22/%3E%3Ctext x=%22256%22 y=%22320%22 font-size=%22250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22%3E🏍%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any"}]}'>
-  
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%23d98c4a%22/%3E%3Ctext x=%22256%22 y=%22320%22 font-size=%22250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22%3E🏍%3C/text%3E%3C/svg%3E">
-  
+  <meta name="description" content="سیستم حسابداری خصوصی قطعات یدکی">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23d98c4a%22/%3E%3Ctext x=%2250%22 y=%2265%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22white%22%3E🏍%3C/text%3E%3C/svg%3E">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
@@ -607,7 +599,6 @@
     }
   </style>
 </head>
-
 <body>
   <div id="toast" class="toast"></div>
 
@@ -636,108 +627,49 @@
   </nav>
 
   <main class="container">
-    <!-- Dashboard -->
     <section id="page-dashboard" class="page active">
       <div class="page-head">
         <div>
           <span class="eyebrow">DASHBOARD</span>
           <h1>داشبورد مالی</h1>
-          <p id="connectionStatus">حالت خصوصی - داده‌ها فقط روی همین دستگاه</p>
+          <p id="connectionStatus">حالت خصوصی</p>
         </div>
         <button class="primary-btn mobile-only" onclick="openDocumentForm()">＋ ثبت سند</button>
       </div>
 
       <div class="cards">
-        <div class="stat-card accent-blue">
-          <div class="stat-icon">▤</div>
-          <div>
-            <span>تعداد اسناد</span>
-            <strong id="statDocs">0</strong>
-          </div>
-        </div>
-        <div class="stat-card accent-green">
-          <div class="stat-icon">↗</div>
-          <div>
-            <span>جمع بدهکار</span>
-            <strong id="statDebit">0</strong>
-          </div>
-        </div>
-        <div class="stat-card accent-red">
-          <div class="stat-icon">↙</div>
-          <div>
-            <span>جمع بستانکار</span>
-            <strong id="statCredit">0</strong>
-          </div>
-        </div>
-        <div class="stat-card accent-dark">
-          <div class="stat-icon">⚡</div>
-          <div>
-            <span>مانده کل</span>
-            <strong id="statBalance">0</strong>
-          </div>
-        </div>
+        <div class="stat-card accent-blue"><div class="stat-icon">▤</div><div><span>تعداد اسناد</span><strong id="statDocs">0</strong></div></div>
+        <div class="stat-card accent-green"><div class="stat-icon">↗</div><div><span>جمع بدهکار</span><strong id="statDebit">0</strong></div></div>
+        <div class="stat-card accent-red"><div class="stat-icon">↙</div><div><span>جمع بستانکار</span><strong id="statCredit">0</strong></div></div>
+        <div class="stat-card accent-dark"><div class="stat-icon">⚡</div><div><span>مانده کل</span><strong id="statBalance">0</strong></div></div>
       </div>
 
       <div class="dashboard-grid">
         <div class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>آخرین اسناد</h2>
-              <span>آخرین ثبت‌های مالی</span>
-            </div>
-            <button class="text-btn" onclick="showPage('documents')">مشاهده همه ←</button>
-          </div>
+          <div class="panel-head"><div><h2>آخرین اسناد</h2><span>آخرین ثبت‌ها</span></div><button class="text-btn" onclick="showPage('documents')">مشاهده همه ←</button></div>
           <div id="recentDocs" class="recent-list"></div>
         </div>
-
         <div class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>حساب‌های منتخب</h2>
-              <span>مانده حساب‌ها</span>
-            </div>
-          </div>
+          <div class="panel-head"><div><h2>حساب‌های منتخب</h2><span>مانده حساب‌ها</span></div></div>
           <div id="accountSnapshot" class="snapshot-list"></div>
         </div>
       </div>
     </section>
 
-    <!-- Documents -->
     <section id="page-documents" class="page">
       <div class="page-head">
-        <div>
-          <span class="eyebrow">DOCUMENTS</span>
-          <h1>اسناد مالی</h1>
-          <p>ثبت، مشاهده و مدیریت اسناد</p>
-        </div>
-        <button class="primary-btn" onclick="openDocumentForm()">＋ ثبت سند جدید</button>
+        <div><span class="eyebrow">DOCUMENTS</span><h1>اسناد مالی</h1><p>مدیریت اسناد</p></div>
+        <button class="primary-btn" onclick="openDocumentForm()">＋ ثبت سند</button>
       </div>
-
       <div class="toolbar">
-        <div class="search-box">
-          <span>🔍</span>
-          <input id="docSearch" type="text" placeholder="جستجو در اسناد..." oninput="renderDocuments()">
-        </div>
-        <button class="ghost-btn" onclick="clearDocumentSearch()">پاک کردن</button>
+        <div class="search-box"><span>🔍</span><input id="docSearch" type="text" placeholder="جستجو..." oninput="renderDocuments()"></div>
+        <button class="ghost-btn" onclick="clearDocumentSearch()">پاک</button>
       </div>
-
       <div class="summary-bar" id="docSummary"></div>
-
       <div class="panel table-panel">
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>شماره</th>
-                <th>تاریخ</th>
-                <th>معین</th>
-                <th>تفصیلی</th>
-                <th>بدهکار</th>
-                <th>بستانکار</th>
-                <th>شرح</th>
-                <th>عملیات</th>
-              </tr>
-            </thead>
+            <thead><tr><th>شماره</th><th>تاریخ</th><th>معین</th><th>تفصیلی</th><th>بدهکار</th><th>بستانکار</th><th>شرح</th><th>عملیات</th></tr></thead>
             <tbody id="documentsBody"></tbody>
           </table>
           <div id="documentsMobile" class="mobile-cards"></div>
@@ -745,43 +677,21 @@
       </div>
     </section>
 
-    <!-- Accounts -->
     <section id="page-accounts" class="page">
       <div class="page-head">
-        <div>
-          <span class="eyebrow">ACCOUNTS</span>
-          <h1>دفاتر معین</h1>
-          <p>مدیریت دفاتر معین</p>
-        </div>
+        <div><span class="eyebrow">ACCOUNTS</span><h1>دفاتر معین</h1><p>مدیریت دفاتر</p></div>
         <button class="primary-btn" onclick="openAccountForm()">＋ دفتر معین</button>
       </div>
-
       <div class="toolbar">
-        <div class="search-box">
-          <span>🔍</span>
-          <input id="accountSearch" type="text" placeholder="جستجو در دفاتر معین..." oninput="renderAccounts()">
-        </div>
-        <button class="ghost-btn" onclick="clearAccountSearch()">پاک کردن</button>
+        <div class="search-box"><span>🔍</span><input id="accountSearch" type="text" placeholder="جستجو..." oninput="renderAccounts()"></div>
+        <button class="ghost-btn" onclick="clearAccountSearch()">پاک</button>
       </div>
-
       <div class="summary-bar" id="accountSummary"></div>
-
       <div class="cards mini-cards" id="accountCards"></div>
-
       <div class="panel table-panel">
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>دفتر معین</th>
-                <th>بدهکار</th>
-                <th>بستانکار</th>
-                <th>مانده</th>
-                <th>تعداد سند</th>
-                <th>عملیات</th>
-              </tr>
-            </thead>
+            <thead><tr><th>#</th><th>دفتر معین</th><th>بدهکار</th><th>بستانکار</th><th>مانده</th><th>تعداد</th><th>عملیات</th></tr></thead>
             <tbody id="accountsBody"></tbody>
           </table>
           <div id="accountsMobile" class="mobile-cards"></div>
@@ -789,42 +699,20 @@
       </div>
     </section>
 
-    <!-- Details -->
     <section id="page-details" class="page">
       <div class="page-head">
-        <div>
-          <span class="eyebrow">DETAILS</span>
-          <h1>دفاتر تفصیلی</h1>
-          <p>مدیریت تفصیلی‌ها</p>
-        </div>
+        <div><span class="eyebrow">DETAILS</span><h1>دفاتر تفصیلی</h1><p>مدیریت تفصیلی‌ها</p></div>
         <button class="primary-btn" onclick="openDetailForm()">＋ تفصیلی</button>
       </div>
-
       <div class="toolbar">
-        <div class="search-box">
-          <span>🔍</span>
-          <input id="detailSearch" type="text" placeholder="جستجو در تفصیلی‌ها..." oninput="renderDetails()">
-        </div>
-        <button class="ghost-btn" onclick="clearDetailSearch()">پاک کردن</button>
+        <div class="search-box"><span>🔍</span><input id="detailSearch" type="text" placeholder="جستجو..." oninput="renderDetails()"></div>
+        <button class="ghost-btn" onclick="clearDetailSearch()">پاک</button>
       </div>
-
       <div class="summary-bar" id="detailSummary"></div>
-
       <div class="panel table-panel">
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>دفتر معین</th>
-                <th>دفتر تفصیلی</th>
-                <th>ملاحظات</th>
-                <th>بدهکار</th>
-                <th>بستانکار</th>
-                <th>مانده</th>
-                <th>عملیات</th>
-              </tr>
-            </thead>
+            <thead><tr><th>#</th><th>معین</th><th>تفصیلی</th><th>ملاحظات</th><th>بدهکار</th><th>بستانکار</th><th>مانده</th><th>عملیات</th></tr></thead>
             <tbody id="detailsBody"></tbody>
           </table>
           <div id="detailsMobile" class="mobile-cards"></div>
@@ -833,73 +721,29 @@
     </section>
   </main>
 
-  <!-- Modals -->
   <div id="documentModal" class="modal">
     <div class="modal-card modal-wide">
-      <div class="modal-head">
-        <div>
-          <span class="eyebrow">FINANCIAL ENTRY</span>
-          <h2 id="documentModalTitle">ثبت سند جدید</h2>
-        </div>
-        <button class="close-btn" onclick="closeModal('documentModal')">×</button>
-      </div>
-
+      <div class="modal-head"><div><span class="eyebrow">ENTRY</span><h2 id="documentModalTitle">ثبت سند</h2></div><button class="close-btn" onclick="closeModal('documentModal')">×</button></div>
       <form id="documentForm" onsubmit="saveDocument(event)">
         <input type="hidden" id="docRow">
         <div class="form-grid">
-          <label>
-            <span>شماره سند</span>
-            <input id="docNumber" type="text" readonly class="readonly">
-          </label>
-          <label>
-            <span>تاریخ <small>(شمسی)</small></span>
-            <input id="docDate" type="text" placeholder="1405-05-26" autocomplete="off">
-          </label>
-          <label>
-            <span>دفتر معین</span>
-            <select id="docAccount" onchange="onAccountChange()"></select>
-          </label>
-          <label>
-            <span>دفتر تفصیلی</span>
-            <select id="docDetail" onchange="onDetailChange()"></select>
-          </label>
+          <label><span>شماره</span><input id="docNumber" type="text" readonly class="readonly"></label>
+          <label><span>تاریخ</span><input id="docDate" type="text" placeholder="1405-05-26"></label>
+          <label><span>معین</span><select id="docAccount" onchange="onAccountChange()"></select></label>
+          <label><span>تفصیلی</span><select id="docDetail" onchange="onDetailChange()"></select></label>
         </div>
-
         <div class="balance-preview">
-          <div class="balance-box">
-            <span>مانده معین</span>
-            <strong id="selectedAccountBalance">0</strong>
-          </div>
-          <div class="balance-box">
-            <span>مانده تفصیلی</span>
-            <strong id="selectedDetailBalance">0</strong>
-          </div>
+          <div class="balance-box"><span>مانده معین</span><strong id="selectedAccountBalance">0</strong></div>
+          <div class="balance-box"><span>مانده تفصیلی</span><strong id="selectedDetailBalance">0</strong></div>
         </div>
-
-        <div class="form-grid amounts">
-          <label>
-            <span>بدهکار</span>
-            <div class="money-input">
-              <input id="docDebit" inputmode="numeric" placeholder="0" oninput="formatMoneyInput(this)">
-              <b>ریال</b>
-            </div>
-          </label>
-          <label>
-            <span>بستانکار</span>
-            <div class="money-input">
-              <input id="docCredit" inputmode="numeric" placeholder="0" oninput="formatMoneyInput(this)">
-              <b>ریال</b>
-            </div>
-          </label>
-          <label class="full">
-            <span>شرح</span>
-            <textarea id="docDescription" rows="3" placeholder="شرح سند..."></textarea>
-          </label>
+        <div class="form-grid">
+          <label><span>بدهکار</span><div class="money-input"><input id="docDebit" inputmode="numeric" placeholder="0" oninput="formatMoneyInput(this)"><b>ریال</b></div></label>
+          <label><span>بستانکار</span><div class="money-input"><input id="docCredit" inputmode="numeric" placeholder="0" oninput="formatMoneyInput(this)"><b>ریال</b></div></label>
+          <label class="full"><span>شرح</span><textarea id="docDescription" rows="3"></textarea></label>
         </div>
-
         <div class="modal-actions">
           <button type="button" class="ghost-btn" onclick="closeModal('documentModal')">انصراف</button>
-          <button type="submit" class="primary-btn" id="documentSaveBtn">ثبت سند</button>
+          <button type="submit" class="primary-btn" id="documentSaveBtn">ثبت</button>
         </div>
       </form>
     </div>
@@ -907,58 +751,24 @@
 
   <div id="accountModal" class="modal">
     <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <span class="eyebrow">ACCOUNT</span>
-          <h2 id="accountModalTitle">دفتر معین جدید</h2>
-        </div>
-        <button class="close-btn" onclick="closeModal('accountModal')">×</button>
-      </div>
+      <div class="modal-head"><div><span class="eyebrow">ACCOUNT</span><h2 id="accountModalTitle">دفتر معین</h2></div><button class="close-btn" onclick="closeModal('accountModal')">×</button></div>
       <form onsubmit="saveAccount(event)">
         <input type="hidden" id="accountOldName">
-        <label>
-          <span>نام دفتر معین</span>
-          <input id="accountName" type="text" required placeholder="مثلاً خرید قطعات">
-        </label>
-        <div class="modal-actions">
-          <button type="button" class="ghost-btn" onclick="closeModal('accountModal')">انصراف</button>
-          <button type="submit" class="primary-btn">ذخیره</button>
-        </div>
+        <label><span>نام</span><input id="accountName" type="text" required></label>
+        <div class="modal-actions"><button type="button" class="ghost-btn" onclick="closeModal('accountModal')">انصراف</button><button type="submit" class="primary-btn">ذخیره</button></div>
       </form>
     </div>
   </div>
 
   <div id="detailModal" class="modal">
     <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <span class="eyebrow">DETAIL</span>
-          <h2 id="detailModalTitle">تفصیلی جدید</h2>
-        </div>
-        <button class="close-btn" onclick="closeModal('detailModal')">×</button>
-      </div>
+      <div class="modal-head"><div><span class="eyebrow">DETAIL</span><h2 id="detailModalTitle">تفصیلی</h2></div><button class="close-btn" onclick="closeModal('detailModal')">×</button></div>
       <form onsubmit="saveDetail(event)">
-        <input type="hidden" id="detailOldAccount">
-        <input type="hidden" id="detailOldName">
-        <input type="hidden" id="detailOldNote">
-
-        <label>
-          <span>دفتر معین</span>
-          <select id="detailAccount" required></select>
-        </label>
-        <label>
-          <span>دفتر تفصیلی</span>
-          <input id="detailName" type="text" required placeholder="نام تفصیلی">
-        </label>
-        <label>
-          <span>ملاحظات</span>
-          <textarea id="detailNote" rows="3" placeholder="ملاحظات اختیاری"></textarea>
-        </label>
-
-        <div class="modal-actions">
-          <button type="button" class="ghost-btn" onclick="closeModal('detailModal')">انصراف</button>
-          <button type="submit" class="primary-btn">ذخیره</button>
-        </div>
+        <input type="hidden" id="detailOldAccount"><input type="hidden" id="detailOldName"><input type="hidden" id="detailOldNote">
+        <label><span>معین</span><select id="detailAccount" required></select></label>
+        <label><span>نام</span><input id="detailName" type="text" required></label>
+        <label><span>ملاحظات</span><textarea id="detailNote" rows="3"></textarea></label>
+        <div class="modal-actions"><button type="button" class="ghost-btn" onclick="closeModal('detailModal')">انصراف</button><button type="submit" class="primary-btn">ذخیره</button></div>
       </form>
     </div>
   </div>
@@ -966,530 +776,109 @@
   <div id="deleteModal" class="modal">
     <div class="modal-card delete-modal-card">
       <div class="delete-icon">🗑</div>
-      <h3 id="deleteTitle">حذف رکورد</h3>
-      <p id="deleteMessage">آیا از حذف این رکورد مطمئن هستید؟</p>
-      <div class="delete-actions">
-        <button class="btn-cancel" onclick="closeModal('deleteModal')">انصراف</button>
-        <button class="btn-danger" id="deleteConfirmBtn" onclick="confirmDelete()">حذف</button>
-      </div>
+      <h3 id="deleteTitle">حذف</h3>
+      <p id="deleteMessage">مطمئن هستید؟</p>
+      <div class="delete-actions"><button class="btn-cancel" onclick="closeModal('deleteModal')">انصراف</button><button class="btn-danger" onclick="confirmDelete()">حذف</button></div>
     </div>
   </div>
 
-  <div id="loading" class="loading-overlay">
-    <div class="loader"></div>
-    <span>در حال بارگذاری...</span>
-  </div>
+  <div id="loading" class="loading-overlay"><div class="loader"></div><span>...</span></div>
 
   <script>
-    // ============================================
-    // Persian Calendar
-    // ============================================
     function getTodayJalali() {
       const now = new Date();
-      return gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+      return gregorianToJalali(now.getFullYear(), now.getMonth()+1, now.getDate());
+    }
+    function gregorianToJalali(gy,gm,gd){
+      const g=[0,31,59,90,120,151,181,212,243,273,304,334];
+      let jy=(gy<=1600)?0:979;gy-=(gy<=1600)?621:1600;
+      const gy2=(gm>2)?(gy+1):gy;
+      let days=(365*gy)+Math.floor((gy2+3)/4)-Math.floor((gy2+99)/100)+Math.floor((gy2+399)/400)-80+gd+g[gm-1];
+      jy+=33*Math.floor(days/12053);days%=12053;jy+=4*Math.floor(days/1461);days%=1461;
+      if(days>365){jy+=Math.floor((days-1)/365);days=(days-1)%365;}
+      const jm=(days<186)?1+Math.floor(days/31):7+Math.floor((days-186)/30);
+      const jd=1+((days<186)?(days%31):((days-186)%30));
+      return `${jy}-${String(jm).padStart(2,'0')}-${String(jd).padStart(2,'0')}`;
     }
 
-    function gregorianToJalali(gy, gm, gd) {
-      const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-      let jy = (gy <= 1600) ? 0 : 979;
-      gy -= (gy <= 1600) ? 621 : 1600;
-      const gy2 = (gm > 2) ? (gy + 1) : gy;
-      let days = (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
-      jy += 33 * Math.floor(days / 12053);
-      days %= 12053;
-      jy += 4 * Math.floor(days / 1461);
-      days %= 1461;
-      if (days > 365) { jy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
-      const jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
-      const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
-      return `${jy}-${String(jm).padStart(2, '0')}-${String(jd).padStart(2, '0')}`;
-    }
+    let db;const DB_NAME='PulsePartsDB_Private',DB_VERSION=1;
+    function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VERSION);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('accounts')){const s=d.createObjectStore('accounts',{keyPath:'id',autoIncrement:true});s.createIndex('name','name',{unique:true});}if(!d.objectStoreNames.contains('details')){const s=d.createObjectStore('details',{keyPath:'id',autoIncrement:true});s.createIndex('account','account',{unique:false});s.createIndex('name','name',{unique:false});}if(!d.objectStoreNames.contains('documents')){const s=d.createObjectStore('documents',{keyPath:'id',autoIncrement:true});s.createIndex('number','number',{unique:false});s.createIndex('account','account',{unique:false});s.createIndex('detail','detail',{unique:false});s.createIndex('date','date',{unique:false});}};r.onsuccess=e=>{db=e.target.result;res(db);};r.onerror=e=>rej(e.target.error);});}
+    function addRecord(s,d){return new Promise((res,rej)=>{const t=db.transaction([s],'readwrite');const st=t.objectStore(s);const r=st.add(d);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+    function getAllRecords(s){return new Promise((res,rej)=>{const t=db.transaction([s],'readonly');const st=t.objectStore(s);const r=st.getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+    function updateRecord(s,id,d){return new Promise((res,rej)=>{const t=db.transaction([s],'readwrite');const st=t.objectStore(s);const g=st.get(id);g.onsuccess=()=>{const e=g.result;if(e){const u={...e,...d,id};const p=st.put(u);p.onsuccess=()=>res(p.result);p.onerror=()=>rej(p.error);}else rej(new Error('not found'));};g.onerror=()=>rej(g.error);});}
+    function deleteRecord(s,id){return new Promise((res,rej)=>{const t=db.transaction([s],'readwrite');const st=t.objectStore(s);const r=st.delete(id);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
+    function clearStore(s){return new Promise((res,rej)=>{const t=db.transaction([s],'readwrite');const st=t.objectStore(s);const r=st.clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
 
-    // ============================================
-    // IndexedDB
-    // ============================================
-    let db;
-    const DB_NAME = 'PulsePartsDB_Private';
-    const DB_VERSION = 1;
+    let appData={accounts:[],details:[],documents:[]},busy=false,deleteTarget=null;
+    const $=id=>document.getElementById(id);
+    function showLoading(s=true){$('loading').classList.toggle('show',s);}
+    function toast(m,t='success'){const e=$('toast');e.textContent=m;e.className='toast show '+t;clearTimeout(window.__t);window.__t=setTimeout(()=>e.className='toast',3000);}
+    function normalizeDigits(v){return String(v??'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));}
+    function parseMoney(v){return Number(normalizeDigits(v).replace(/,/g,'').replace(/[^\d.-]/g,''))||0;}
+    function formatMoney(v){return new Intl.NumberFormat('en-US').format(Math.round(Number(v)||0));}
+    function formatMoneyInput(i){const v=parseMoney(i.value);i.value=v?formatMoney(v):'';}
+    function moneyClass(v){return Number(v)>=0?'positive':'negative';}
+    function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-theme')||'light';applyTheme(c==='dark'?'light':'dark');}
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t);const b=$('themeToggle');if(b)b.textContent=t==='dark'?'☀':'🌙';const m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='dark'?'#0a0b0d':'#f6f4ef');}
+    function rowClass(v){return Number(v)>=0?'row-credit':'row-debit';}
+    function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+    
+    async function refreshData(silent=false){if(busy)return;busy=true;if(!silent)showLoading(true);try{const[a,d,c]=await Promise.all([getAllRecords('accounts'),getAllRecords('details'),getAllRecords('documents')]);appData={accounts:a.map(x=>x.name),details:d,documents:c};renderAll();$('connectionStatus').textContent=`${c.length} سند · ${a.length} معین · ${d.length} تفصیلی`;}catch(e){console.error(e);toast('خطا','error');}finally{busy=false;showLoading(false);}}
+    function renderAll(){renderDashboard();renderDocuments();renderAccounts();renderDetails();populateAccountSelects();}
+    function showPage(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));$('page-'+p).classList.add('active');document.querySelector(`.tab[data-page="${p}"]`)?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+    function calculateStats(){let d=0,c=0;appData.documents.forEach(x=>{d+=Number(x.debit)||0;c+=Number(x.credit)||0;});return{debit:d,credit:c,balance:d-c};}
+    function getAccountStats(n){let d=0,c=0,ct=0;appData.documents.forEach(x=>{if(x.account===n){d+=Number(x.debit)||0;c+=Number(x.credit)||0;ct++;}});return{debit:d,credit:c,balance:d-c,count:ct};}
+    function getDetailStats(a,n){let d=0,c=0,ct=0;appData.documents.forEach(x=>{if(x.account===a&&x.detail===n){d+=Number(x.debit)||0;c+=Number(x.credit)||0;ct++;}});return{debit:d,credit:c,balance:d-c,count:ct};}
+    function emptyState(t){return `<div class="empty-state"><div>⌁</div><span>${t}</span></div>`;}
 
-    function openDB() {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onupgradeneeded = (event) => {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains('accounts')) {
-            const store = db.createObjectStore('accounts', { keyPath: 'id', autoIncrement: true });
-            store.createIndex('name', 'name', { unique: true });
-          }
-          if (!db.objectStoreNames.contains('details')) {
-            const store = db.createObjectStore('details', { keyPath: 'id', autoIncrement: true });
-            store.createIndex('account', 'account', { unique: false });
-            store.createIndex('name', 'name', { unique: false });
-          }
-          if (!db.objectStoreNames.contains('documents')) {
-            const store = db.createObjectStore('documents', { keyPath: 'id', autoIncrement: true });
-            store.createIndex('number', 'number', { unique: false });
-            store.createIndex('account', 'account', { unique: false });
-            store.createIndex('detail', 'detail', { unique: false });
-            store.createIndex('date', 'date', { unique: false });
-          }
-        };
-        request.onsuccess = (event) => { db = event.target.result; resolve(db); };
-        request.onerror = (event) => reject(event.target.error);
+    function renderDashboard(){const s=calculateStats();$('statDocs').textContent=formatMoney(appData.documents.length);$('statDebit').textContent=formatMoney(s.debit);$('statCredit').textContent=formatMoney(s.credit);$('statBalance').textContent=formatMoney(s.balance);const recent=[...appData.documents].reverse().slice(0,7);$('recentDocs').innerHTML=recent.length?recent.map(d=>`<div class="recent-item"><div class="doc-badge">${escapeHtml(d.number)}</div><div class="recent-main"><strong>${escapeHtml(d.account)}</strong><span>${escapeHtml(d.detail)} · ${escapeHtml(d.date)}</span></div><div class="recent-amount ${d.debit>0?'debit':'credit'}">${formatMoney(d.debit||d.credit)}<small>${d.debit>0?'بدهکار':'بستانکار'}</small></div></div>`).join(''):emptyState('سندی نیست');$('accountSnapshot').innerHTML=appData.accounts.slice(0,7).map(a=>{const s=getAccountStats(a);return `<div class="snapshot-item"><div class="avatar">${escapeHtml(a[0])}</div><div class="snapshot-main"><strong>${escapeHtml(a)}</strong><span>${s.count} سند</span></div><b class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</b></div>`;}).join('')||emptyState('معینی نیست');}
+
+    function renderDocuments(){const q=normalizeDigits($('docSearch')?.value||'').toLowerCase();const f=appData.documents.filter(d=>!q||[d.number,d.date,d.account,d.detail,d.description].some(x=>String(x??'').toLowerCase().includes(q)));let d=0,c=0;f.forEach(x=>{d+=Number(x.debit)||0;c+=Number(x.credit)||0;});$('docSummary').innerHTML=`<div class="summary-item"><span>تعداد</span><strong style="color:var(--blue)">${formatMoney(f.length)}</strong></div><div class="summary-item"><span>بدهکار</span><strong class="debit">${formatMoney(d)}</strong></div><div class="summary-item"><span>بستانکار</span><strong class="credit">${formatMoney(c)}</strong></div><div class="summary-item"><span>مانده</span><strong class="${moneyClass(d-c)}">${formatMoney(d-c)}</strong></div>`;$('documentsBody').innerHTML=f.length?f.map(x=>`<tr class="${x.debit>0?'row-debit':'row-credit'}"><td><span class="doc-number">${escapeHtml(x.number)}</span></td><td class="date-cell">${escapeHtml(x.date)}</td><td><b>${escapeHtml(x.account)}</b></td><td>${escapeHtml(x.detail)}</td><td class="money debit">${x.debit?formatMoney(x.debit):'—'}</td><td class="money credit">${x.credit?formatMoney(x.credit):'—'}</td><td class="description-cell">${escapeHtml(x.description)}</td><td class="actions"><button class="small-btn edit" onclick="editDocument(${x.id})">✎</button><button class="small-btn delete" onclick="showDeleteModal('document',${x.id},'سند ${x.number}')">🗑</button></td></tr>`).join(''):`<tr><td colspan="8">${emptyState('سندی نیست')}</td></tr>`;$('documentsMobile').innerHTML=f.length?f.map(x=>`<div class="mobile-card ${x.debit>0?'row-debit':'row-credit'}"><div class="mobile-card-header"><span class="mobile-card-title">سند ${escapeHtml(x.number)}</span><span class="mobile-card-badge">${escapeHtml(x.date)}</span></div><div class="mobile-card-body"><div class="mobile-card-row"><span class="mobile-card-label">معین</span><span class="mobile-card-value">${escapeHtml(x.account)}</span></div><div class="mobile-card-row"><span class="mobile-card-label">تفصیلی</span><span class="mobile-card-value">${escapeHtml(x.detail)}</span></div><div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${x.debit?formatMoney(x.debit):'—'}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${x.credit?formatMoney(x.credit):'—'}</strong></div></div>${x.description?`<div class="mobile-card-row"><span class="mobile-card-label">شرح</span><span class="mobile-card-value">${escapeHtml(x.description)}</span></div>`:''}<div class="mobile-card-actions"><button class="small-btn edit" onclick="editDocument(${x.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('document',${x.id},'سند ${x.number}')">🗑 حذف</button></div></div></div>`).join(''):emptyState('سندی نیست');}
+
+    function renderAccounts(){const q=normalizeDigits($('accountSearch')?.value||'').toLowerCase();const t=appData.accounts.filter(a=>!q||a.toLowerCase().includes(q)).map(a=>({name:a,...getAccountStats(a)}));let d=0,c=0;t.forEach(a=>{d+=a.debit;c+=a.credit;});$('accountSummary').innerHTML=`<div class="summary-item"><span>تعداد</span><strong style="color:var(--blue)">${formatMoney(t.length)}</strong></div><div class="summary-item"><span>بدهکار</span><strong class="debit">${formatMoney(d)}</strong></div><div class="summary-item"><span>بستانکار</span><strong class="credit">${formatMoney(c)}</strong></div><div class="summary-item"><span>مانده</span><strong class="${moneyClass(d-c)}">${formatMoney(d-c)}</strong></div>`;$('accountCards').innerHTML=t.slice(0,4).map(a=>`<div class="stat-card compact"><div class="stat-icon">◉</div><div><span>${escapeHtml(a.name)}</span><strong>${formatMoney(a.balance)}</strong><small>${a.count} سند</small></div></div>`).join('');$('accountsBody').innerHTML=t.length?t.map((a,i)=>`<tr class="${rowClass(a.balance)}"><td>${i+1}</td><td><b>${escapeHtml(a.name)}</b></td><td class="money debit">${formatMoney(a.debit)}</td><td class="money credit">${formatMoney(a.credit)}</td><td class="money ${moneyClass(a.balance)}">${formatMoney(a.balance)}</td><td>${formatMoney(a.count)}</td><td class="actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎</button><button class="small-btn delete" onclick="showDeleteModal('account','${encodeURIComponent(a.name)}','معین «${a.name}»')">🗑</button></td></tr>`).join(''):`<tr><td colspan="7">${emptyState('معینی نیست')}</td></tr>`;$('accountsMobile').innerHTML=t.length?t.map((a,i)=>`<div class="mobile-card ${rowClass(a.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(a.name)}</span><span class="mobile-card-badge">${a.count} سند</span></div><div class="mobile-card-body"><div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑</span><strong class="debit">${formatMoney(a.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓</span><strong class="credit">${formatMoney(a.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده</span><strong class="${moneyClass(a.balance)}">${formatMoney(a.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎</button><button class="small-btn delete" onclick="showDeleteModal('account','${encodeURIComponent(a.name)}','معین «${a.name}»')">🗑</button></div></div></div>`).join(''):emptyState('معینی نیست');}
+
+    function renderDetails(){const q=normalizeDigits($('detailSearch')?.value||'').toLowerCase();const f=appData.details.filter(d=>!q||[d.account,d.name,d.note].some(x=>String(x??'').toLowerCase().includes(q)));let d=0,c=0;f.forEach(x=>{const s=getDetailStats(x.account,x.name);d+=s.debit;c+=s.credit;});$('detailSummary').innerHTML=`<div class="summary-item"><span>تعداد</span><strong style="color:var(--blue)">${formatMoney(f.length)}</strong></div><div class="summary-item"><span>بدهکار</span><strong class="debit">${formatMoney(d)}</strong></div><div class="summary-item"><span>بستانکار</span><strong class="credit">${formatMoney(c)}</strong></div><div class="summary-item"><span>مانده</span><strong class="${moneyClass(d-c)}">${formatMoney(d-c)}</strong></div>`;$('detailsBody').innerHTML=f.length?f.map((x,i)=>{const s=getDetailStats(x.account,x.name);return `<tr class="${rowClass(s.balance)}"><td>${i+1}</td><td><b>${escapeHtml(x.account)}</b></td><td>${escapeHtml(x.name)}</td><td>${escapeHtml(x.note)}</td><td class="money debit">${formatMoney(s.debit)}</td><td class="money credit">${formatMoney(s.credit)}</td><td class="money ${moneyClass(s.balance)}">${formatMoney(s.balance)}</td><td class="actions"><button class="small-btn edit" onclick="editDetail(${x.id})">✎</button><button class="small-btn delete" onclick="showDeleteModal('detail',${x.id},'تفصیلی «${x.name}»')">🗑</button></td></tr>`;}).join(''):`<tr><td colspan="8">${emptyState('تفصیلی نیست')}</td></tr>`;$('detailsMobile').innerHTML=f.length?f.map((x,i)=>{const s=getDetailStats(x.account,x.name);return `<div class="mobile-card ${rowClass(s.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(x.name)}</span><span class="mobile-card-badge">${escapeHtml(x.account)}</span></div><div class="mobile-card-body">${x.note?`<div class="mobile-card-row"><span class="mobile-card-label">ملاحظات</span><span class="mobile-card-value">${escapeHtml(x.note)}</span></div>`:''}<div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑</span><strong class="debit">${formatMoney(s.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓</span><strong class="credit">${formatMoney(s.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده</span><strong class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editDetail(${x.id})">✎</button><button class="small-btn delete" onclick="showDeleteModal('detail',${x.id},'تفصیلی «${x.name}»')">🗑</button></div></div></div>`;}).join(''):emptyState('تفصیلی نیست');}
+
+    function populateAccountSelects(){const o='<option value="">انتخاب معین</option>'+appData.accounts.map(a=>`<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');$('docAccount').innerHTML=o;$('detailAccount').innerHTML=o;updateDetailOptions();}
+    function updateDetailOptions(sel=''){const a=$('docAccount').value;const l=appData.details.filter(d=>d.account===a);$('docDetail').innerHTML='<option value="">انتخاب تفصیلی</option>'+l.map(d=>`<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)}</option>`).join('');if(sel)$('docDetail').value=sel;}
+    function onAccountChange(){updateDetailOptions();updateSelectedBalances();}
+    function onDetailChange(){updateSelectedBalances();}
+    function updateSelectedBalances(){const a=$('docAccount').value,d=$('docDetail').value;const as=a?getAccountStats(a):{balance:0};const ds=a&&d?getDetailStats(a,d):{balance:0};$('selectedAccountBalance').textContent=formatMoney(as.balance);$('selectedDetailBalance').textContent=formatMoney(ds.balance);$('selectedAccountBalance').className=moneyClass(as.balance);$('selectedDetailBalance').className=moneyClass(ds.balance);}
+
+    async function openDocumentForm(data=null){$('documentForm').reset();$('docRow').value=data?data.id:'';$('documentModalTitle').textContent=data?'ویرایش سند':'ثبت سند';$('documentSaveBtn').textContent=data?'ذخیره':'ثبت';$('docNumber').value=data?data.number:'...';if(data){$('docDate').value=data.date;$('docAccount').value=data.account;updateDetailOptions(data.detail);$('docDebit').value=data.debit?formatMoney(data.debit):'';$('docCredit').value=data.credit?formatMoney(data.credit):'';$('docDescription').value=data.description;}else{updateDetailOptions();$('docDate').value=getTodayJalali();$('docDebit').value='';$('docCredit').value='';$('docDescription').value='';const docs=await getAllRecords('documents');let m=0;docs.forEach(d=>{const n=parseInt(d.number);if(n>m)m=n;});$('docNumber').value=String(m+1);}updateSelectedBalances();openModal('documentModal');setTimeout(()=>$('docDate').focus(),150);}
+    async function saveDocument(e){e.preventDefault();const debit=parseMoney($('docDebit').value),credit=parseMoney($('docCredit').value);const data={number:$('docNumber').value,date:$('docDate').value.trim(),account:$('docAccount').value,detail:$('docDetail').value,debit,credit,description:$('docDescription').value.trim()};const id=Number($('docRow').value)||0;if(!data.date)return toast('تاریخ','error');if(!data.account)return toast('معین','error');if(!data.detail)return toast('تفصیلی','error');if(debit===0&&credit===0)return toast('مبلغ','error');if(debit>0&&credit>0)return toast('فقط یکی','error');setBusyButton('documentSaveBtn',true);try{if(id>0){await updateRecord('documents',id,data);}else{await addRecord('documents',data);}closeModal('documentModal');toast(id>0?'ویرایش شد':'ثبت شد');await refreshData(true);}catch(err){toast(err.message||'خطا','error');}finally{setBusyButton('documentSaveBtn',false);}}
+    function editDocument(id){const d=appData.documents.find(x=>Number(x.id)===Number(id));if(d)openDocumentForm(d);}
+
+    function openAccountForm(name=''){$('accountModalTitle').textContent=name?'ویرایش معین':'معین جدید';$('accountOldName').value=name;$('accountName').value=name;openModal('accountModal');setTimeout(()=>$('accountName').focus(),150);}
+    async function saveAccount(e){e.preventDefault();const old=$('accountOldName').value,name=$('accountName').value.trim();if(!name)return;showLoading(true);try{if(old){const accs=await getAllRecords('accounts');const acc=accs.find(a=>a.name===old);if(acc){await updateRecord('accounts',acc.id,{name});const dets=await getAllRecords('details');const docs=await getAllRecords('documents');for(const d of dets){if(d.account===old){await updateRecord('details',d.id,{account:name});}}for(const d of docs){if(d.account===old){await updateRecord('documents',d.id,{account:name});}}}toast('ویرایش شد');}else{const accs=await getAllRecords('accounts');if(accs.some(a=>a.name===name))throw new Error('تکراری');await addRecord('accounts',{name});toast('اضافه شد');}closeModal('accountModal');await refreshData(true);}catch(err){toast(err.message||'خطا','error');}finally{showLoading(false);}}
+    function editAccount(encoded){openAccountForm(decodeURIComponent(encoded));}
+
+    function openDetailForm(data=null){$('detailModalTitle').textContent=data?'ویرایش تفصیلی':'تفصیلی جدید';$('detailOldAccount').value=data?data.account:'';$('detailOldName').value=data?data.name:'';$('detailOldNote').value=data?data.note:'';$('detailAccount').value=data?data.account:'';$('detailName').value=data?data.name:'';$('detailNote').value=data?data.note:'';openModal('detailModal');setTimeout(()=>$('detailName').focus(),150);}
+    async function saveDetail(e){e.preventDefault();const oa=$('detailOldAccount').value,on=$('detailOldName').value,onote=$('detailOldNote').value;const data={account:$('detailAccount').value,name:$('detailName').value.trim(),note:$('detailNote').value.trim()};if(!data.account)return toast('معین','error');if(!data.name)return toast('نام','error');showLoading(true);try{if(on){const dets=await getAllRecords('details');const det=dets.find(d=>d.account===oa&&d.name===on&&d.note===onote);if(det){await updateRecord('details',det.id,data);if(oa!==data.account||on!==data.name){const docs=await getAllRecords('documents');for(const d of docs){if(d.account===oa&&d.detail===on){await updateRecord('documents',d.id,{account:data.account,detail:data.name});}}}}toast('ویرایش شد');}else{const dets=await getAllRecords('details');if(dets.some(d=>d.account===data.account&&d.name===data.name))throw new Error('تکراری');await addRecord('details',data);toast('اضافه شد');}closeModal('detailModal');await refreshData(true);}catch(err){toast(err.message||'خطا','error');}finally{showLoading(false);}}
+    function editDetail(id){const d=appData.details.find(x=>Number(x.id)===Number(id));if(d)openDetailForm(d);}
+
+    function showDeleteModal(type,target,title){deleteTarget={type,target};$('deleteTitle').textContent=title;if(type==='document'){const d=appData.documents.find(x=>Number(x.id)===Number(target));$('deleteMessage').textContent=`حذف سند ${d.number}؟`;}else if(type==='account'){const n=decodeURIComponent(target);$('deleteMessage').textContent=`حذف معین «${n}»؟`;}else if(type==='detail'){const d=appData.details.find(x=>Number(x.id)===Number(target));$('deleteMessage').textContent=`حذف تفصیلی «${d.name}»؟`;}openModal('deleteModal');}
+    async function confirmDelete(){if(!deleteTarget)return;const{type,target}=deleteTarget;closeModal('deleteModal');showLoading(true);try{if(type==='document'){await deleteRecord('documents',target);toast('حذف شد');}else if(type==='account'){const n=decodeURIComponent(target);const docs=await getAllRecords('documents');if(docs.some(d=>d.account===n))throw new Error('دارای سند');const accs=await getAllRecords('accounts');const acc=accs.find(a=>a.name===n);if(acc)await deleteRecord('accounts',acc.id);toast('حذف شد');}else if(type==='detail'){const dets=await getAllRecords('details');const det=dets.find(d=>d.id===target);const docs=await getAllRecords('documents');if(docs.some(d=>d.account===det.account&&d.detail===det.name))throw new Error('دارای سند');await deleteRecord('details',target);toast('حذف شد');}await refreshData(true);}catch(err){toast(err.message||'خطا','error');}finally{showLoading(false);deleteTarget=null;}}
+
+    function openModal(id){$(id).classList.add('show');document.body.classList.add('modal-open');}
+    function closeModal(id){$(id).classList.remove('show');document.body.classList.remove('modal-open');}
+    document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
+    function clearDocumentSearch(){$('docSearch').value='';renderDocuments();}
+    function clearAccountSearch(){$('accountSearch').value='';renderAccounts();}
+    function clearDetailSearch(){$('detailSearch').value='';renderDetails();}
+    function setBusyButton(id,b){const btn=$(id);if(!btn)return;btn.disabled=b;if(!btn.dataset.old)btn.dataset.old=btn.textContent;btn.textContent=b?'...':btn.dataset.old;}
+    window.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>closeModal(m.id));});
+
+    async function exportData(){try{const data={version:1,exportedAt:new Date().toISOString(),accounts:await getAllRecords('accounts'),details:await getAllRecords('details'),documents:await getAllRecords('documents')};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`pulse-backup-${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(url);toast('پشتیبانگیری شد');}catch(e){toast('خطا','error');}}
+    async function importData(file){if(!file)return;try{const text=await file.text();const data=JSON.parse(text);if(!data.accounts||!data.details||!data.documents)throw new Error('نامعتبر');if(!confirm('پاک شود؟'))return;showLoading(true);await clearStore('accounts');await clearStore('details');await clearStore('documents');for(const a of data.accounts){await addRecord('accounts',{name:a.name});}for(const d of data.details){await addRecord('details',{account:d.account,name:d.name,note:d.note||''});}for(const d of data.documents){await addRecord('documents',{number:d.number,date:d.date,account:d.account,detail:d.detail,debit:d.debit,credit:d.credit,description:d.description||''});}await refreshData(true);toast('بازیابی شد');}catch(e){toast('خطا: '+e.message,'error');}finally{showLoading(false);$('importFile').value='';}}
+
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',()=>{
+        navigator.serviceWorker.register('sw.js').catch(err=>console.log('SW:',err));
       });
     }
 
-    function addRecord(storeName, data) {
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
-        const request = store.add(data);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    function getAllRecords(storeName) {
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction([storeName], 'readonly');
-        const store = transaction.objectStore(storeName);
-        const request = store.getAll();
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    function updateRecord(storeName, id, data) {
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
-        const getRequest = store.get(id);
-        getRequest.onsuccess = () => {
-          const existingRecord = getRequest.result;
-          if (existingRecord) {
-            const updatedRecord = { ...existingRecord, ...data, id: id };
-            const putRequest = store.put(updatedRecord);
-            putRequest.onsuccess = () => resolve(putRequest.result);
-            putRequest.onerror = () => reject(putRequest.error);
-          } else {
-            reject(new Error('رکورد یافت نشد'));
-          }
-        };
-        getRequest.onerror = () => reject(getRequest.error);
-      });
-    }
-
-    function deleteRecord(storeName, id) {
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
-        const request = store.delete(id);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    function clearStore(storeName) {
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
-        const request = store.clear();
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    // ============================================
-    // App State
-    // ============================================
-    let appData = { accounts: [], details: [], documents: [] };
-    let busy = false;
-    let deleteTarget = null;
-
-    const $ = id => document.getElementById(id);
-
-    function showLoading(show = true) { $('loading').classList.toggle('show', show); }
-
-    function toast(message, type = 'success') {
-      const el = $('toast');
-      el.textContent = message;
-      el.className = 'toast show ' + type;
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => el.className = 'toast', 3000);
-    }
-
-    function normalizeDigits(value) {
-      return String(value ?? '').replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
-    }
-
-    function parseMoney(value) {
-      return Number(normalizeDigits(value).replace(/,/g, '').replace(/[^\d.-]/g, '')) || 0;
-    }
-
-    function formatMoney(value) {
-      return new Intl.NumberFormat('en-US').format(Math.round(Number(value) || 0));
-    }
-
-    function formatMoneyInput(input) {
-      const value = parseMoney(input.value);
-      input.value = value ? formatMoney(value) : '';
-    }
-
-    function moneyClass(value) { return Number(value) >= 0 ? 'positive' : 'negative'; }
-
-    function toggleTheme() {
-      const html = document.documentElement;
-      const current = html.getAttribute('data-theme') || 'light';
-      applyTheme(current === 'dark' ? 'light' : 'dark');
-    }
-
-    function applyTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
-      const btn = $('themeToggle');
-      if (btn) btn.textContent = theme === 'dark' ? '☀' : '🌙';
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', theme === 'dark' ? '#0a0b0d' : '#f6f4ef');
-    }
-
-    function rowClass(value) { return Number(value) >= 0 ? 'row-credit' : 'row-debit'; }
-
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-    }
-
-    async function refreshData(silent = false) {
-      if (busy) return;
-      busy = true;
-      if (!silent) showLoading(true);
-      try {
-        const [accounts, details, documents] = await Promise.all([
-          getAllRecords('accounts'), getAllRecords('details'), getAllRecords('documents')
-        ]);
-        appData = { accounts: accounts.map(a => a.name), details, documents };
-        renderAll();
-        $('connectionStatus').textContent = `حالت خصوصی · ${documents.length} سند · ${accounts.length} معین · ${details.length} تفصیلی`;
-      } catch (err) { console.error(err); toast('خطا در خواندن داده‌ها', 'error'); }
-      finally { busy = false; showLoading(false); }
-    }
-
-    function renderAll() {
-      renderDashboard(); renderDocuments(); renderAccounts(); renderDetails(); populateAccountSelects();
-    }
-
-    function showPage(page) {
-      document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-      $('page-' + page).classList.add('active');
-      document.querySelector(`.tab[data-page="${page}"]`)?.classList.add('active');
-      window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-
-    function calculateStats() {
-      let debit = 0, credit = 0;
-      appData.documents.forEach(d => { debit += Number(d.debit)||0; credit += Number(d.credit)||0; });
-      return { debit, credit, balance: debit - credit };
-    }
-
-    function getAccountStats(name) {
-      let debit = 0, credit = 0, count = 0;
-      appData.documents.forEach(d => { if(d.account === name){ debit += Number(d.debit)||0; credit += Number(d.credit)||0; count++; } });
-      return { debit, credit, balance: debit - credit, count };
-    }
-
-    function getDetailStats(account, detail) {
-      let debit = 0, credit = 0, count = 0;
-      appData.documents.forEach(d => { if(d.account === account && d.detail === detail){ debit += Number(d.debit)||0; credit += Number(d.credit)||0; count++; } });
-      return { debit, credit, balance: debit - credit, count };
-    }
-
-    function renderDashboard() {
-      const s = calculateStats();
-      $('statDocs').textContent = formatMoney(appData.documents.length);
-      $('statDebit').textContent = formatMoney(s.debit);
-      $('statCredit').textContent = formatMoney(s.credit);
-      $('statBalance').textContent = formatMoney(s.balance);
-
-      const recent = [...appData.documents].reverse().slice(0, 7);
-      $('recentDocs').innerHTML = recent.length ? recent.map(d => `
-        <div class="recent-item">
-          <div class="doc-badge">${escapeHtml(d.number)}</div>
-          <div class="recent-main"><strong>${escapeHtml(d.account)}</strong><span>${escapeHtml(d.detail)} · ${escapeHtml(d.date)}</span></div>
-          <div class="recent-amount ${d.debit > 0 ? 'debit' : 'credit'}">${formatMoney(d.debit || d.credit)}<small>${d.debit > 0 ? 'بدهکار' : 'بستانکار'}</small></div>
-        </div>`).join('') : emptyState('هنوز سندی ثبت نشده است');
-
-      $('accountSnapshot').innerHTML = appData.accounts.slice(0, 7).map(a => {
-        const s = getAccountStats(a);
-        return `<div class="snapshot-item"><div class="avatar">${escapeHtml(a.substring(0,1))}</div><div class="snapshot-main"><strong>${escapeHtml(a)}</strong><span>${s.count} سند</span></div><b class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</b></div>`;
-      }).join('') || emptyState('دفتر معینی ثبت نشده است');
-    }
-
-    function renderDocuments() {
-      const q = normalizeDigits($('docSearch')?.value || '').trim().toLowerCase();
-      const filtered = appData.documents.filter(d => !q || [d.number, d.date, d.account, d.detail, d.description].some(x => String(x??'').toLowerCase().includes(q)));
-      let debit=0, credit=0;
-      filtered.forEach(d => { debit += Number(d.debit)||0; credit += Number(d.credit)||0; });
-      $('docSummary').innerHTML = `
-        <div class="summary-item"><span>تعداد اسناد</span><strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong></div>
-        <div class="summary-item"><span>جمع بدهکار</span><strong class="debit">${formatMoney(debit)}</strong></div>
-        <div class="summary-item"><span>جمع بستانکار</span><strong class="credit">${formatMoney(credit)}</strong></div>
-        <div class="summary-item"><span>مانده</span><strong class="${moneyClass(debit-credit)}">${formatMoney(debit-credit)}</strong></div>`;
-      $('documentsBody').innerHTML = filtered.length ? filtered.map(d => `
-        <tr class="${d.debit>0?'row-debit':'row-credit'}">
-          <td><span class="doc-number">${escapeHtml(d.number)}</span></td>
-          <td class="date-cell">${escapeHtml(d.date)}</td>
-          <td><b>${escapeHtml(d.account)}</b></td>
-          <td>${escapeHtml(d.detail)}</td>
-          <td class="money debit">${d.debit?formatMoney(d.debit):'—'}</td>
-          <td class="money credit">${d.credit?formatMoney(d.credit):'—'}</td>
-          <td class="description-cell">${escapeHtml(d.description)}</td>
-          <td class="actions"><button class="small-btn edit" onclick="editDocument(${d.id})">✎</button><button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند ${d.number}')">🗑</button></td>
-        </tr>`).join('') : `<tr><td colspan="8">${emptyState('سندی پیدا نشد')}</td></tr>`;
-
-      $('documentsMobile').innerHTML = filtered.length ? filtered.map(d => `
-        <div class="mobile-card ${d.debit>0?'row-debit':'row-credit'}">
-          <div class="mobile-card-header"><span class="mobile-card-title">سند ${escapeHtml(d.number)}</span><span class="mobile-card-badge">${escapeHtml(d.date)}</span></div>
-          <div class="mobile-card-body">
-            <div class="mobile-card-row"><span class="mobile-card-label">معین</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.account)}</span></div>
-            <div class="mobile-card-row"><span class="mobile-card-label">تفصیلی</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.detail)}</span></div>
-            <div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${d.debit?formatMoney(d.debit):'—'}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${d.credit?formatMoney(d.credit):'—'}</strong></div></div>
-            ${d.description?`<div class="mobile-card-row"><span class="mobile-card-label">شرح</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.description)}</span></div>`:''}
-            <div class="mobile-card-actions"><button class="small-btn edit" onclick="editDocument(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند ${d.number}')">🗑 حذف</button></div>
-          </div>
-        </div>`).join('') : emptyState('سندی پیدا نشد');
-    }
-
-    function renderAccounts() {
-      const q = normalizeDigits($('accountSearch')?.value || '').trim().toLowerCase();
-      const totals = appData.accounts.filter(a => !q || a.toLowerCase().includes(q)).map(a => ({name:a, ...getAccountStats(a)}));
-      let debit=0, credit=0; totals.forEach(a => { debit += a.debit; credit += a.credit; });
-      $('accountSummary').innerHTML = `<div class="summary-item"><span>تعداد معین</span><strong style="color:var(--blue)">${formatMoney(totals.length)}</strong></div><div class="summary-item"><span>جمع بدهکار</span><strong class="debit">${formatMoney(debit)}</strong></div><div class="summary-item"><span>جمع بستانکار</span><strong class="credit">${formatMoney(credit)}</strong></div><div class="summary-item"><span>مانده کل</span><strong class="${moneyClass(debit-credit)}">${formatMoney(debit-credit)}</strong></div>`;
-      $('accountCards').innerHTML = totals.slice(0,4).map(a => `<div class="stat-card compact"><div class="stat-icon">◉</div><div><span>${escapeHtml(a.name)}</span><strong>${formatMoney(a.balance)}</strong><small>${a.count} سند</small></div></div>`).join('');
-      $('accountsBody').innerHTML = totals.length ? totals.map((a,i)=>`<tr class="${rowClass(a.balance)}"><td>${i+1}</td><td><b>${escapeHtml(a.name)}</b></td><td class="money debit">${formatMoney(a.debit)}</td><td class="money credit">${formatMoney(a.credit)}</td><td class="money ${moneyClass(a.balance)}">${formatMoney(a.balance)}</td><td>${formatMoney(a.count)}</td><td class="actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎</button><button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'معین «${a.name}»')">🗑</button></td></tr>`).join('') : `<tr><td colspan="7">${emptyState('دفتر معینی ثبت نشده')}</td></tr>`;
-      $('accountsMobile').innerHTML = totals.length ? totals.map((a,i)=>`<div class="mobile-card ${rowClass(a.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(a.name)}</span><span class="mobile-card-badge">${a.count} سند</span></div><div class="mobile-card-body"><div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${formatMoney(a.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${formatMoney(a.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده</span><strong class="${moneyClass(a.balance)}">${formatMoney(a.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'معین «${a.name}»')">🗑 حذف</button></div></div></div>`).join('') : emptyState('دفتر معینی ثبت نشده');
-    }
-
-    function renderDetails() {
-      const q = normalizeDigits($('detailSearch')?.value || '').trim().toLowerCase();
-      const filtered = appData.details.filter(d => !q || [d.account, d.name, d.note].some(x=>String(x??'').toLowerCase().includes(q)));
-      let debit=0, credit=0; filtered.forEach(d => { const s = getDetailStats(d.account, d.name); debit += s.debit; credit += s.credit; });
-      $('detailSummary').innerHTML = `<div class="summary-item"><span>تعداد تفصیلی</span><strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong></div><div class="summary-item"><span>جمع بدهکار</span><strong class="debit">${formatMoney(debit)}</strong></div><div class="summary-item"><span>جمع بستانکار</span><strong class="credit">${formatMoney(credit)}</strong></div><div class="summary-item"><span>مانده کل</span><strong class="${moneyClass(debit-credit)}">${formatMoney(debit-credit)}</strong></div>`;
-      $('detailsBody').innerHTML = filtered.length ? filtered.map((d,i)=>{ const s = getDetailStats(d.account,d.name); return `<tr class="${rowClass(s.balance)}"><td>${i+1}</td><td><b>${escapeHtml(d.account)}</b></td><td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.note)}</td><td class="money debit">${formatMoney(s.debit)}</td><td class="money credit">${formatMoney(s.credit)}</td><td class="money ${moneyClass(s.balance)}">${formatMoney(s.balance)}</td><td class="actions"><button class="small-btn edit" onclick="editDetail(${d.id})">✎</button><button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑</button></td></tr>`; }).join('') : `<tr><td colspan="8">${emptyState('تفصیلی ثبت نشده')}</td></tr>`;
-      $('detailsMobile').innerHTML = filtered.length ? filtered.map((d,i)=>{ const s = getDetailStats(d.account,d.name); return `<div class="mobile-card ${rowClass(s.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(d.name)}</span><span class="mobile-card-badge">${escapeHtml(d.account)}</span></div><div class="mobile-card-body">${d.note?`<div class="mobile-card-row"><span class="mobile-card-label">ملاحظات</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.note)}</span></div>`:''}<div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${formatMoney(s.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${formatMoney(s.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده</span><strong class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editDetail(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑 حذف</button></div></div></div>`; }).join('') : emptyState('تفصیلی ثبت نشده');
-    }
-
-    function emptyState(text){ return `<div class="empty-state"><div>⌁</div><span>${text}</span></div>`; }
-
-    function populateAccountSelects() {
-      const accountOptions = '<option value="">انتخاب دفتر معین</option>' + appData.accounts.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
-      $('docAccount').innerHTML = accountOptions;
-      $('detailAccount').innerHTML = accountOptions;
-      updateDetailOptions();
-    }
-
-    function updateDetailOptions(selected='') {
-      const account = $('docAccount').value;
-      const list = appData.details.filter(d => d.account === account);
-      $('docDetail').innerHTML = '<option value="">انتخاب دفتر تفصیلی</option>' + list.map(d => `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)}</option>`).join('');
-      if(selected) $('docDetail').value = selected;
-    }
-
-    function onAccountChange(){ updateDetailOptions(); updateSelectedBalances(); }
-    function onDetailChange(){ updateSelectedBalances(); }
-
-    function updateSelectedBalances(){
-      const account = $('docAccount').value, detail = $('docDetail').value;
-      const a = account ? getAccountStats(account) : {balance:0};
-      const d = account && detail ? getDetailStats(account, detail) : {balance:0};
-      $('selectedAccountBalance').textContent = formatMoney(a.balance);
-      $('selectedDetailBalance').textContent = formatMoney(d.balance);
-      $('selectedAccountBalance').className = moneyClass(a.balance);
-      $('selectedDetailBalance').className = moneyClass(d.balance);
-    }
-
-    async function openDocumentForm(data=null) {
-      $('documentForm').reset();
-      $('docRow').value = data ? data.id : '';
-      $('documentModalTitle').textContent = data ? 'ویرایش سند' : 'ثبت سند جدید';
-      $('documentSaveBtn').textContent = data ? 'ذخیره تغییرات' : 'ثبت سند';
-      $('docNumber').value = data ? data.number : '...';
-
-      if(data) {
-        $('docDate').value = data.date;
-        $('docAccount').value = data.account;
-        updateDetailOptions(data.detail);
-        $('docDebit').value = data.debit ? formatMoney(data.debit) : '';
-        $('docCredit').value = data.credit ? formatMoney(data.credit) : '';
-        $('docDescription').value = data.description;
-      } else {
-        updateDetailOptions();
-        $('docDate').value = getTodayJalali();
-        $('docDebit').value = ''; $('docCredit').value = ''; $('docDescription').value = '';
-        const documents = await getAllRecords('documents');
-        let maxNumber = 0;
-        documents.forEach(d => { const n = parseInt(d.number); if(n > maxNumber) maxNumber = n; });
-        $('docNumber').value = String(maxNumber + 1);
-      }
-      updateSelectedBalances();
-      openModal('documentModal');
-      setTimeout(() => $('docDate').focus(), 150);
-    }
-
-    async function saveDocument(e){
-      e.preventDefault();
-      const debit = parseMoney($('docDebit').value), credit = parseMoney($('docCredit').value);
-      const data = { number: $('docNumber').value, date: $('docDate').value.trim(), account: $('docAccount').value, detail: $('docDetail').value, debit, credit, description: $('docDescription').value.trim() };
-      const id = Number($('docRow').value) || 0;
-      
-      if(!data.date) return toast('تاریخ را وارد کنید', 'error');
-      if(!data.account) return toast('دفتر معین را انتخاب کنید', 'error');
-      if(!data.detail) return toast('دفتر تفصیلی را انتخاب کنید', 'error');
-      if(debit === 0 && credit === 0) return toast('بدهکار یا بستانکار را وارد کنید', 'error');
-      if(debit > 0 && credit > 0) return toast('فقط یکی را وارد کنید', 'error');
-      
-      setBusyButton('documentSaveBtn', true);
-      try {
-        if(id > 0) { await updateRecord('documents', id, data); }
-        else { await addRecord('documents', data); }
-        closeModal('documentModal'); toast(id > 0 ? 'سند ویرایش شد' : 'سند ثبت شد');
-        await refreshData(true);
-      } catch(err){ toast(err.message || 'خطا', 'error'); }
-      finally{ setBusyButton('documentSaveBtn', false); }
-    }
-
-    function editDocument(id){ const d = appData.documents.find(x=>Number(x.id)===Number(id)); if(d) openDocumentForm(d); }
-
-    function openAccountForm(name=''){
-      $('accountModalTitle').textContent = name ? 'ویرایش دفتر معین' : 'دفتر معین جدید';
-      $('accountOldName').value = name; $('accountName').value = name;
-      openModal('accountModal'); setTimeout(()=>$('accountName').focus(),150);
-    }
-
-    async function saveAccount(e){
-      e.preventDefault();
-      const oldName = $('accountOldName').value, name = $('accountName').value.trim();
-      if(!name) return;
-      showLoading(true);
-      try{
-        if(oldName){
-          const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===oldName);
-          if(account){ 
-            await updateRecord('accounts', account.id, {name});
-            const details = await getAllRecords('details'); const documents = await getAllRecords('documents');
-            for(const detail of details){ if(detail.account===oldName){ await updateRecord('details', detail.id, {account:name}); } }
-            for(const doc of documents){ if(doc.account===oldName){ await updateRecord('documents', doc.id, {account:name}); } }
-          }
-          toast('دفتر معین ویرایش شد');
-        } else {
-          const accounts = await getAllRecords('accounts'); if(accounts.some(a=>a.name===name)) throw new Error('تکراری است');
-          await addRecord('accounts', {name}); toast('دفتر معین اضافه شد');
-        }
-        closeModal('accountModal'); await refreshData(true);
-      } catch(err){ toast(err.message || 'خطا','error'); } finally{ showLoading(false); }
-    }
-
-    function editAccount(encoded){ openAccountForm(decodeURIComponent(encoded)); }
-
-    function openDetailForm(data=null){
-      $('detailModalTitle').textContent = data ? 'ویرایش تفصیلی' : 'تفصیلی جدید';
-      $('detailOldAccount').value = data ? data.account : ''; $('detailOldName').value = data ? data.name : ''; $('detailOldNote').value = data ? data.note : '';
-      $('detailAccount').value = data ? data.account : ''; $('detailName').value = data ? data.name : ''; $('detailNote').value = data ? data.note : '';
-      openModal('detailModal'); setTimeout(()=>$('detailName').focus(),150);
-    }
-
-    async function saveDetail(e){
-      e.preventDefault();
-      const oldAccount = $('detailOldAccount').value, oldName = $('detailOldName').value, oldNote = $('detailOldNote').value;
-      const data = { account: $('detailAccount').value, name: $('detailName').value.trim(), note: $('detailNote').value.trim() };
-      if(!data.account) return toast('معین را انتخاب کنید','error');
-      if(!data.name) return toast('نام را وارد کنید','error');
-      showLoading(true);
-      try{
-        if(oldName){
-          const details = await getAllRecords('details'); const detail = details.find(d=>d.account===oldAccount && d.name===oldName && d.note===oldNote);
-          if(detail){ 
-            await updateRecord('details', detail.id, data); 
-            if(oldAccount!==data.account || oldName!==data.name){ 
-              const documents = await getAllRecords('documents'); 
-              for(const doc of documents){ if(doc.account===oldAccount && doc.detail===oldName){ await updateRecord('documents', doc.id, {account:data.account, detail:data.name}); } } 
-            } 
-          }
-          toast('تفصیلی ویرایش شد');
-        } else {
-          const details = await getAllRecords('details'); if(details.some(d=>d.account===data.account && d.name===data.name)) throw new Error('تکراری است');
-          await addRecord('details', data); toast('تفصیلی اضافه شد');
-        }
-        closeModal('detailModal'); await refreshData(true);
-      } catch(err){ toast(err.message || 'خطا','error'); } finally{ showLoading(false); }
-    }
-
-    function editDetail(id){ const d = appData.details.find(x=>Number(x.id)===Number(id)); if(d) openDetailForm(d); }
-
-    function showDeleteModal(type, target, title){
-      deleteTarget = {type, target}; $('deleteTitle').textContent = title;
-      if(type === 'document'){ const d = appData.documents.find(x=>Number(x.id)===Number(target)); $('deleteMessage').textContent = `حذف سند ${d.number}؟`; }
-      else if(type === 'account'){ const name = decodeURIComponent(target); $('deleteMessage').textContent = `حذف معین «${name}»؟`; }
-      else if(type === 'detail'){ const d = appData.details.find(x=>Number(x.id)===Number(target)); $('deleteMessage').textContent = `حذف تفصیلی «${d.name}»؟`; }
-      openModal('deleteModal');
-    }
-
-    async function confirmDelete(){
-      if(!deleteTarget) return;
-      const {type, target} = deleteTarget; closeModal('deleteModal'); showLoading(true);
-      try{
-        if(type === 'document'){ await deleteRecord('documents', target); toast('سند حذف شد'); }
-        else if(type === 'account'){ const name = decodeURIComponent(target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===name)) throw new Error('دارای سند است'); const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===name); if(account) await deleteRecord('accounts', account.id); toast('معین حذف شد'); }
-        else if(type === 'detail'){ const details = await getAllRecords('details'); const detail = details.find(d=>d.id===target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===detail.account && d.detail===detail.name)) throw new Error('دارای سند است'); await deleteRecord('details', target); toast('تفصیلی حذف شد'); }
-        await refreshData(true);
-      } catch(err){ toast(err.message || 'خطا','error'); } finally{ showLoading(false); deleteTarget = null; }
-    }
-
-    function openModal(id){ $(id).classList.add('show'); document.body.classList.add('modal-open'); }
-    function closeModal(id){ $(id).classList.remove('show'); document.body.classList.remove('modal-open'); }
-
-    document.querySelectorAll('.modal').forEach(modal => modal.addEventListener('click', e => { if(e.target === modal) closeModal(modal.id); }));
-
-    function clearDocumentSearch(){ $('docSearch').value=''; renderDocuments(); }
-    function clearAccountSearch(){ $('accountSearch').value=''; renderAccounts(); }
-    function clearDetailSearch(){ $('detailSearch').value=''; renderDetails(); }
-
-    function setBusyButton(id, busy){ const btn = $(id); if(!btn) return; btn.disabled = busy; if(!btn.dataset.oldText) btn.dataset.oldText = btn.textContent; btn.textContent = busy ? '...' : btn.dataset.oldText; }
-
-    window.addEventListener('keydown', e => { if(e.key === 'Escape') document.querySelectorAll('.modal.show').forEach(m => closeModal(m.id)); });
-
-    async function exportData(){
-      try{
-        const data = { version:1, exportedAt:new Date().toISOString(), accounts:await getAllRecords('accounts'), details:await getAllRecords('details'), documents:await getAllRecords('documents') };
-        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`pulse-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url);
-        toast('پشتیبان‌گیری انجام شد');
-      } catch(error){ toast('خطا در پشتیبان‌گیری','error'); }
-    }
-
-    async function importData(file){
-      if(!file) return;
-      try{
-        const text = await file.text(); const data = JSON.parse(text);
-        if(!data.accounts || !data.details || !data.documents) throw new Error('فایل نامعتبر');
-        if(!confirm('داده‌ها پاک شوند؟')) return;
-        showLoading(true);
-        await clearStore('accounts'); await clearStore('details'); await clearStore('documents');
-        for(const account of data.accounts){ await addRecord('accounts', {name:account.name}); }
-        for(const detail of data.details){ await addRecord('details', {account:detail.account, name:detail.name, note:detail.note||''}); }
-        for(const doc of data.documents){ await addRecord('documents', {number:doc.number, date:doc.date, account:doc.account, detail:doc.detail, debit:doc.debit, credit:doc.credit, description:doc.description||''}); }
-        await refreshData(true); toast('بازیابی انجام شد');
-      } catch(error){ toast('خطا: '+error.message,'error'); }
-      finally{ showLoading(false); $('importFile').value=''; }
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      try{
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        applyTheme(savedTheme);
-        await openDB();
-        await refreshData();
-      } catch(error){ console.error(error); toast('خطا در راه‌اندازی','error'); }
-    });
+    document.addEventListener('DOMContentLoaded',async()=>{try{const t=localStorage.getItem('theme')||'light';applyTheme(t);await openDB();await refreshData();}catch(e){console.error(e);toast('خطا','error');}});
   </script>
 </body>
 </html>
