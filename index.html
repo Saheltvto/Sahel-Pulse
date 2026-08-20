@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>قطعات یدکی موتور سیکلت پالس - آفلاین</title>
+  <meta name="theme-color" content="#0a0b0d">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+ 
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
+
+/* ==========================================================================
+   TOKENS
+   دو پوسته: سیاه (پیش‌فرض) و روشن، با ورودی data-theme روی <html>.
+   طرح رنگی: خنثی + یک لهجه مسی کم‌رنگ (الهام از قطعات فلزی موتور)
+   اعداد همیشه با فونت monospace، ارقام لاتین و تابیولار نمایش داده می‌شوند
+   تا ردیف‌بندی و خوانایی مبالغ حداکثر شود.
+========================================================================== */
+:root{
+  --bg:#0a0b0d;
+  --surface:#131519;
+  --surface-2:#191c21;
+  --surface-hover:#1f232a;
+  --line:#22262d;
+  --line-strong:#2c313a;
+
+  --text:#eef0f3;
+  --text-dim:#9aa2ad;
+  --text-faint:#5c6470;
+
+  --accent:#d98c4a;
+  --accent-strong:#e59a57;
+  --accent-soft:rgba(217,140,74,.14);
+
+  --blue:#5b9dff;
+  --blue-soft:rgba(91,157,255,.14);
+
+  --green:#3fb873;
+  --green-soft:rgba(63,184,115,.14);
+
+  --red:#ef5b5b;
+  --red-soft:rgba(239,91,91,.14);
+
+  --radius-lg:16px;
+  --radius:12px;
+  --radius-sm:8px;
+
+  --shadow-card:0 3px 14px rgba(0,0,0,.35);
+  --shadow-pop:0 10px 30px rgba(0,0,0,.4);
+  --overlay:rgba(10,11,13,.9);
+  --overlay-heavy:rgba(10,11,13,.75);
+
+  --font-ui:'Vazirmatn',Tahoma,sans-serif;
+  --font-num:'JetBrains Mono','Vazirmatn',monospace;
+
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --dur:.15s;
+
+  color-scheme:dark;
+}
+
+:root[data-theme="light"]{
+  --bg:#f6f4ef;
+  --surface:#ffffff;
+  --surface-2:#f1eee6;
+  --surface-hover:#e9e5da;
+  --line:#e2ddd0;
+  --line-strong:#cfc8b8;
+
+  --text:#191a1c;
+  --text-dim:#585c63;
+  --text-faint:#6c6f76;
+
+  --accent:#b8611c;
+  --accent-strong:#9a5116;
+  --accent-soft:rgba(184,97,28,.10);
+
+  --blue:#2358d6;
+  --blue-soft:rgba(35,88,214,.09);
+
+  --green:#0f7a3d;
+  --green-soft:rgba(15,122,61,.09);
+
+  --red:#c22a2f;
+  --red-soft:rgba(194,42,47,.09);
+
+  --shadow-card:0 2px 10px rgba(30,25,15,.06);
+  --shadow-pop:0 16px 40px rgba(30,25,15,.14);
+  --overlay:rgba(246,244,239,.92);
+  --overlay-heavy:rgba(246,244,239,.8);
+
+  color-scheme:light;
+}
+
+html[data-theme="light"] body::before{
+  background:radial-gradient(ellipse 900px 500px at 15% -5%, rgba(184,97,28,.07), transparent 60%);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-ui);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  font-size:14.5px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+/* یک هاله ثابت و کم‌رنگ به‌جای پس‌زمینه متحرک قبلی — سبک‌تر و آرام‌تر */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:radial-gradient(ellipse 900px 500px at 15% -5%, rgba(217,140,74,.06), transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+body.modal-open{overflow:hidden}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;background:none;color:inherit}
+button:disabled{opacity:.5;cursor:wait}
+
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent-soft)}
+
+/* ==========================================================================
+   TOPBAR + TABS
+========================================================================== */
+.topbar{
+  height:64px;
+  background:var(--overlay);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{
+  width:40px;height:40px;border-radius:11px;
+  display:grid;place-items:center;
+  background:var(--accent-soft);
+  border:1px solid var(--accent);
+  color:var(--accent-strong);
+  font-size:19px;
+}
+
+.brand-title{font-size:15px;font-weight:800;letter-spacing:-.2px;color:var(--text)}
+.brand-subtitle{font-size:10.5px;color:var(--text-faint);margin-top:2px}
+
+.top-actions{display:flex;gap:8px;align-items:center}
+
+.tabs{
+  height:50px;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:0 24px;
+  position:sticky;
+  top:64px;
+  z-index:45;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none}
+
+.tab{
+  height:34px;
+  padding:0 16px;
+  border-radius:var(--radius-sm);
+  color:var(--text-dim);
+  font-weight:600;
+  font-size:12.5px;
+  white-space:nowrap;
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.tab:hover{color:var(--text);background:var(--surface)}
+.tab.active{color:#fff;background:var(--accent)}
+
+/* ==========================================================================
+   LAYOUT
+========================================================================== */
+.container{max-width:1440px;margin:0 auto;padding:24px;position:relative;z-index:1}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .2s var(--ease)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.page-head h1{margin:5px 0 5px;font-size:27px;font-weight:800;letter-spacing:-.5px;color:var(--text)}
+.page-head p{margin:0;color:var(--text-faint);font-size:11.5px}
+.eyebrow{color:var(--accent);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+
+h1,h2,h3{font-family:var(--font-ui)}
+
+/* ==========================================================================
+   STAT CARDS (dashboard) — تمرکز اصلی روی خوانایی خود عدد
+========================================================================== */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+
+.stat-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:18px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-height:92px;
+  box-shadow:var(--shadow-card);
+  transition:border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.stat-card:hover{border-color:var(--line-strong);transform:translateY(-2px);box-shadow:var(--shadow-pop)}
+
+.stat-icon{
+  width:42px;height:42px;border-radius:var(--radius);
+  display:grid;place-items:center;font-size:19px;flex:none;
+}
+.accent-blue .stat-icon{background:var(--blue-soft);color:var(--blue)}
+.accent-green .stat-icon{background:var(--green-soft);color:var(--green)}
+.accent-red .stat-icon{background:var(--red-soft);color:var(--red)}
+.accent-dark .stat-icon{background:var(--accent-soft);color:var(--accent-strong)}
+
+.stat-card span{display:block;color:var(--text-faint);font-size:10.5px;margin-bottom:7px;letter-spacing:.2px}
+.stat-card strong{
+  display:block;font-family:var(--font-num);
+  font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.3px;
+  direction:ltr;text-align:right;color:var(--text);
+}
+
+.stat-card.compact{padding:14px;min-height:auto}
+.stat-card.compact div>span{font-size:10px}
+.stat-card.compact strong{font-size:20px}
+.stat-card.compact small{color:var(--text-faint);font-size:9.5px}
+.mini-cards{grid-template-columns:repeat(4,1fr)}
+
+/* ==========================================================================
+   PANELS (dashboard lists)
+========================================================================== */
+.dashboard-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card)}
+
+.panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.panel-head h2{font-size:13.5px;margin:0 0 3px;font-weight:700}
+.panel-head span{font-size:10px;color:var(--text-faint)}
+
+.recent-list,.snapshot-list{padding:4px 16px}
+
+.recent-item,.snapshot-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 2px;border-bottom:1px solid var(--line);
+  transition:background var(--dur) var(--ease);border-radius:8px;
+}
+.recent-item:hover,.snapshot-item:hover{background:var(--surface-2)}
+.recent-item:last-child,.snapshot-item:last-child{border-bottom:0}
+
+.doc-badge{
+  min-width:38px;height:32px;border-radius:var(--radius-sm);
+  background:var(--accent-soft);color:var(--accent-strong);
+  display:grid;place-items:center;font-family:var(--font-num);
+  font-size:11px;font-weight:700;border:1px solid var(--line);
+}
+
+.recent-main,.snapshot-main{flex:1;min-width:0}
+.recent-main strong,.snapshot-main strong{display:block;font-size:12px;font-weight:700}
+.recent-main span,.snapshot-main span{display:block;color:var(--text-faint);font-size:9.5px;margin-top:4px}
+
+.recent-amount{
+  text-align:left;font-weight:800;font-size:15px;direction:ltr;
+  font-family:var(--font-num);font-variant-numeric:tabular-nums;
+}
+.recent-amount small{display:block;font-size:8.5px;font-weight:500;color:var(--text-faint);margin-top:3px;direction:rtl;font-family:var(--font-ui)}
+
+.debit{color:var(--red)!important}
+.credit{color:var(--green)!important}
+.positive{color:var(--blue)!important}
+.negative{color:var(--red)!important}
+
+.avatar{
+  width:34px;height:34px;border-radius:var(--radius-sm);
+  background:var(--accent-soft);display:grid;place-items:center;
+  font-weight:700;color:var(--accent-strong);font-size:13px;
+}
+
+/* ==========================================================================
+   BUTTONS
+========================================================================== */
+.primary-btn,.ghost-btn,.icon-btn,.text-btn,.small-btn,.close-btn{
+  transition:background var(--dur) var(--ease), border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.primary-btn{
+  background:var(--accent);color:#1a1206;border-radius:var(--radius);
+  min-height:40px;padding:0 18px;font-weight:700;font-size:12.5px;
+}
+.primary-btn:hover{background:var(--accent-strong)}
+.primary-btn:active{transform:scale(.98)}
+
+.ghost-btn{
+  background:var(--surface);color:var(--text);border:1px solid var(--line);
+  border-radius:var(--radius);min-height:40px;padding:0 15px;font-weight:600;font-size:11.5px;
+}
+.ghost-btn:hover{background:var(--surface-hover);border-color:var(--line-strong)}
+
+.icon-btn{
+  width:38px;height:38px;border-radius:var(--radius);
+  background:var(--surface);color:var(--text);font-size:16px;border:1px solid var(--line);
+}
+.icon-btn:hover{background:var(--surface-hover)}
+
+.text-btn{background:none;color:var(--accent);font-size:10.5px;font-weight:700;padding:5px}
+.text-btn:hover{color:var(--accent-strong)}
+
+.small-btn{padding:6px 11px;border-radius:var(--radius-sm);font-size:9.5px;font-weight:700}
+.small-btn.edit{background:var(--blue-soft);color:var(--blue);border:1px solid transparent}
+.small-btn.edit:hover{border-color:var(--blue)}
+.small-btn.delete{background:var(--red-soft);color:var(--red);border:1px solid transparent}
+.small-btn.delete:hover{border-color:var(--red)}
+
+.close-btn{width:34px;height:34px;border-radius:var(--radius-sm);background:var(--surface);font-size:18px;color:var(--text-dim);border:1px solid var(--line)}
+.close-btn:hover{background:var(--red-soft);color:var(--red)}
+
+/* ==========================================================================
+   TOOLBAR / SEARCH
+========================================================================== */
+.toolbar{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+
+.search-box{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  height:42px;display:flex;align-items:center;padding:0 13px;gap:9px;flex:1;
+  transition:border-color var(--dur) var(--ease);
+}
+.search-box:focus-within{border-color:var(--accent)}
+.search-box span{font-size:16px;color:var(--text-faint)}
+.search-box input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:12px}
+.search-box input::placeholder{color:var(--text-faint)}
+
+/* ==========================================================================
+   SUMMARY BAR — رقم‌های کلیدی هر صفحه
+========================================================================== */
+.summary-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+
+.summary-item{
+  flex:1;min-width:140px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:12px 15px;
+}
+.summary-item span{display:block;color:var(--text-faint);font-size:9.5px;margin-bottom:5px}
+.summary-item strong{
+  font-family:var(--font-num);font-size:21px;font-weight:800;letter-spacing:-.2px;
+  font-variant-numeric:tabular-nums;direction:ltr;display:block;text-align:right;
+}
+
+/* ==========================================================================
+   TABLE — ردیف‌ها با نوار رنگی سمت راست برای تشخیص سریع بدهکار/بستانکار
+========================================================================== */
+.table-panel{overflow:hidden}
+.table-wrap{width:100%;overflow:auto}
+
+table{width:100%;border-collapse:collapse;min-width:880px}
+
+th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+
+th{
+  background:var(--surface);color:var(--text-dim);font-size:9.5px;font-weight:800;
+  letter-spacing:.8px;text-transform:uppercase;position:sticky;top:0;z-index:1;
+}
+
+td{font-size:11.5px}
+
+tbody tr{transition:background var(--dur) var(--ease);border-right:3px solid transparent}
+tbody tr:hover{background:var(--surface)}
+tbody tr.row-debit{border-right-color:var(--red)}
+tbody tr.row-credit{border-right-color:var(--green)}
+
+.doc-number{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:4px 10px;font-weight:800;color:var(--accent-strong);font-family:var(--font-num);font-size:12px;
+}
+
+.date-cell{font-family:var(--font-num);direction:ltr;text-align:right;font-variant-numeric:tabular-nums;color:var(--text-dim);font-size:12.5px;font-weight:600}
+
+.money{
+  font-family:var(--font-num);font-weight:800;font-variant-numeric:tabular-nums;
+  direction:ltr;text-align:right;font-size:14px;color:var(--text);
+}
+
+.description-cell{max-width:240px;overflow:hidden;text-overflow:ellipsis;color:var(--text-dim)}
+
+.actions{display:flex;gap:6px}
+
+/* ==========================================================================
+   MOBILE CARDS — بازطراحی‌شده: عدد بدهکار/بستانکار در دو ستون بزرگ و شفاف
+========================================================================== */
+.mobile-card{display:none}
+
+/* ==========================================================================
+   MODAL / FORM
+========================================================================== */
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:18px;z-index:100;
+}
+.modal.show{display:flex;animation:modalFade .15s var(--ease)}
+@keyframes modalFade{from{opacity:0}to{opacity:1}}
+
+.modal-card{
+  width:min(500px,100%);max-height:calc(100vh - 36px);overflow:auto;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-pop);padding:22px;
+  animation:modalSlide .18s var(--ease);
+}
+@keyframes modalSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.modal-wide{width:min(720px,100%)}
+
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.modal-head h2{font-size:16px;margin:4px 0 0;font-weight:800;color:var(--text)}
+
+.delete-modal-card{width:min(380px,100%);text-align:center;padding:28px 24px}
+.delete-icon{
+  width:58px;height:58px;border-radius:50%;margin:0 auto 16px;background:var(--red-soft);
+  border:1px solid var(--red);display:grid;place-items:center;font-size:24px;color:var(--red);
+}
+.delete-modal-card h3{margin:0 0 8px;font-size:15px;font-weight:800}
+.delete-modal-card p{margin:0 0 20px;color:var(--text-dim);font-size:11.5px;line-height:1.7}
+.delete-actions{display:flex;gap:8px;justify-content:center}
+
+.btn-danger{
+  background:var(--red);color:#2a0a0a;border-radius:var(--radius);min-height:40px;
+  padding:0 22px;font-weight:700;font-size:11.5px;
+}
+.btn-danger:hover{background:#f27070}
+.btn-cancel{
+  background:var(--surface-2);color:var(--text);border:1px solid var(--line);
+  border-radius:var(--radius);min-height:40px;padding:0 18px;font-weight:600;font-size:11.5px;
+}
+.btn-cancel:hover{background:var(--surface-hover)}
+
+form label{display:block;margin-bottom:14px}
+form label>span{display:block;font-size:10.5px;font-weight:700;margin-bottom:7px;color:var(--text-dim)}
+form small{color:var(--text-faint);font-weight:400}
+
+input,select,textarea{
+  width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:var(--radius-sm);
+  outline:none;padding:11px 13px;color:var(--text);transition:border-color var(--dur) var(--ease);font-size:12px;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--surface-2);color:var(--text)}
+
+input.readonly{background:var(--surface);color:var(--text-faint);font-weight:700;font-family:var(--font-num)}
+textarea{resize:vertical;min-height:80px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.form-grid label{margin-bottom:14px}
+.form-grid .full{grid-column:1/-1}
+
+/* تاریخ همیشه با فونت اعداد برای خوانایی بیشتر */
+#docDate,#docNumber{font-family:var(--font-num)}
+
+.money-input{position:relative}
+.money-input input{
+  padding-left:50px;text-align:left;direction:ltr;font-weight:800;
+  font-family:var(--font-num);font-size:16px;
+}
+.money-input b{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:9px}
+
+.balance-preview{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);padding:10px;margin:2px 0 16px;
+}
+.balance-box{background:var(--surface);border-radius:var(--radius-sm);padding:11px 13px;border:1px solid var(--line)}
+.balance-box span{display:block;color:var(--text-faint);font-size:9px;margin-bottom:5px}
+.balance-box strong{font-family:var(--font-num);font-size:17px;direction:ltr;display:block;text-align:right;font-weight:800}
+
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--line);padding-top:16px;margin-top:4px}
+
+/* ==========================================================================
+   EMPTY / TOAST / LOADING
+========================================================================== */
+.empty-state{min-height:100px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--text-faint);font-size:11px}
+.empty-state div{font-size:26px;color:var(--line-strong)}
+
+.toast{
+  position:fixed;top:78px;left:50%;transform:translate(-50%,-12px);
+  background:#1c1f24;border:1px solid var(--line-strong);color:#fff;
+  padding:12px 18px;border-radius:var(--radius);font-size:11.5px;
+  box-shadow:var(--shadow-pop);opacity:0;pointer-events:none;z-index:200;
+  transition:all .2s var(--ease);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.error{background:#7a2323;border-color:var(--red)}
+.toast.success{background:#1f5c3a;border-color:var(--green)}
+
+.loading-overlay{
+  position:fixed;inset:0;background:var(--overlay-heavy);display:none;align-items:center;
+  justify-content:center;flex-direction:column;gap:12px;z-index:150;color:var(--text-faint);font-size:11px;
+}
+.loading-overlay.show{display:flex}
+.loader{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ==========================================================================
+   RESPONSIVE
+========================================================================== */
+.mobile-only{display:none}
+
+@media(max-width:1050px){
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .dashboard-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:700px){
+  body{font-size:13.5px}
+
+  .topbar{height:58px;padding:0 14px}
+  .brand-title{font-size:13px}
+  .brand-subtitle{font-size:8.5px}
+  .brand-mark{width:36px;height:36px;font-size:17px}
+
+  .top-actions .primary-btn{display:none}
+
+  .tabs{height:48px;top:58px;padding:0 8px;gap:3px}
+  .tab{padding:0 12px;font-size:10.5px;height:34px}
+
+  .container{padding:16px 12px 28px}
+
+  .page-head{align-items:flex-start;flex-direction:column;gap:10px;margin-bottom:16px}
+  .page-head h1{font-size:20px}
+  .page-head .primary-btn{width:100%}
+
+  .mobile-only{display:block}
+  .desktop-only{display:none}
+
+  .cards{grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+  .stat-card{padding:13px;min-height:78px;gap:9px;border-radius:var(--radius)}
+  .stat-icon{width:34px;height:34px;font-size:15px}
+  .stat-card strong{font-size:17px}
+  .stat-card span{font-size:9px;margin-bottom:4px}
+
+  .dashboard-grid{gap:10px}
+  .panel-head{padding:14px}
+  .recent-list,.snapshot-list{padding:4px 12px}
+
+  .toolbar{margin-bottom:10px}
+  .toolbar .ghost-btn{display:none}
+  .search-box{height:40px}
+
+  .summary-bar{gap:7px;margin-bottom:10px}
+  .summary-item{padding:11px 13px;min-width:calc(50% - 4px)}
+  .summary-item strong{font-size:16px}
+
+  /* جدول → کارت در موبایل */
+  .table-wrap{overflow:visible}
+  table{display:none}
+
+  .mobile-card{
+    display:block;position:relative;background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius-lg);padding:0;margin-bottom:12px;overflow:hidden;
+    box-shadow:var(--shadow-card);
+    transition:transform .12s var(--ease), box-shadow .12s var(--ease);
+    animation:cardPop .28s var(--ease) backwards;
+  }
+  .mobile-card:active{transform:scale(.98)}
+  .mobile-card::before{
+    content:'';position:absolute;top:0;bottom:0;right:0;width:4px;background:var(--line-strong);
+  }
+  .mobile-card.row-debit::before{background:var(--red)}
+  .mobile-card.row-credit::before{background:var(--green)}
+
+  @keyframes cardPop{
+    from{opacity:0;transform:translateY(8px) scale(.98)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+  }
+
+  .mobile-card-header{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:13px 14px;background:var(--surface-2);border-bottom:1px solid var(--line);
+  }
+  .mobile-card-title{font-weight:800;font-size:12.5px;color:var(--text)}
+  .mobile-card-badge{
+    background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent-strong);
+    border-radius:99px;padding:4px 11px;font-size:10px;font-weight:800;
+    font-family:var(--font-num);white-space:nowrap;
+  }
+
+  /* عدد بدهکار/بستانکار به‌صورت دو ستون بزرگ و رنگی کنار هم */
+  .mobile-card-body{padding:12px 14px 14px}
+
+  .mobile-card-amounts{
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:2px;
+  }
+  .mobile-card-amount-box{
+    border-radius:var(--radius-sm);padding:10px 10px;text-align:center;border:1px solid transparent;
+  }
+  .mobile-card-amount-box.is-debit{background:var(--red-soft);border-color:rgba(239,91,91,.25)}
+  .mobile-card-amount-box.is-credit{background:var(--green-soft);border-color:rgba(63,184,115,.25)}
+  .mobile-card-amount-box span{
+    display:flex;align-items:center;justify-content:center;gap:4px;
+    font-size:9px;color:var(--text-faint);margin-bottom:5px;font-weight:700;letter-spacing:.3px;
+  }
+  .mobile-card-amount-box strong{
+    display:block;font-family:var(--font-num);font-size:18px;font-weight:800;
+    font-variant-numeric:tabular-nums;direction:ltr;letter-spacing:-.2px;
+  }
+
+  .mobile-card-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:10.5px;border-bottom:1px dashed var(--line)}
+  .mobile-card-row:last-of-type{border-bottom:0}
+  .mobile-card-label{color:var(--text-faint);font-size:9.5px}
+  .mobile-card-value{font-weight:800;font-size:12.5px;direction:ltr;font-family:var(--font-num)}
+
+  .mobile-card-balance{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:8px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--surface-2);
+  }
+  .mobile-card-balance span{font-size:9.5px;color:var(--text-faint);font-weight:700}
+  .mobile-card-balance strong{font-family:var(--font-num);font-size:15px;font-weight:800;direction:ltr}
+
+  .mobile-card-actions{display:flex;gap:7px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+  .mobile-card-actions .small-btn{flex:1;padding:10px;font-size:10.5px}
+
+  .mobile-card:nth-child(1){animation-delay:.02s}
+  .mobile-card:nth-child(2){animation-delay:.05s}
+  .mobile-card:nth-child(3){animation-delay:.08s}
+  .mobile-card:nth-child(4){animation-delay:.11s}
+  .mobile-card:nth-child(5){animation-delay:.14s}
+  .mobile-card:nth-child(n+6){animation-delay:.16s}
+
+  .form-grid{grid-template-columns:1fr}
+  .form-grid .full{grid-column:auto}
+  .balance-preview{grid-template-columns:1fr 1fr}
+
+  .modal{padding:8px}
+  .modal-card{padding:18px;border-radius:var(--radius)}
+  .modal-wide{width:100%}
+  .modal-head{margin-bottom:16px}
+  .modal-head h2{font-size:15px}
+  .modal-actions .primary-btn,.modal-actions .ghost-btn{flex:1}
+
+  .toast{top:66px;width:calc(100% - 28px);text-align:center}
+  .delete-modal-card{padding:26px 18px}
+}
+
+@media(max-width:390px){
+  .cards{grid-template-columns:1fr}
+  .balance-preview{grid-template-columns:1fr}
+  .summary-item{min-width:100%}
+  .mobile-card-amounts{grid-template-columns:1fr 1fr}
+}
+</style>
+ 
+</head>
+
+<body>
+ <!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>قطعات یدکی موتور سیکلت پالس</title>
+  <meta name="theme-color" content="#0a0b0d">
+  <script>
+    // پوسته را پیش از رندر تنظیم می‌کنیم تا از فلاش رنگی جلوگیری شود
+    (function(){
+      var t = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <?!= include('CSS'); ?>
+</head>
+
+<body>
+  <div id="toast" class="toast"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">🏍</div>
+      <div>
+        <div class="brand-title">قطعات یدکی موتور سیکلت پالس</div>
+        <div class="brand-subtitle">سیستم حسابداری پیشرفته</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="تغییر پوسته">☀</button>
+      <button class="icon-btn" onclick="refreshData()" title="به‌روزرسانی">⟳</button>
+      <button class="primary-btn desktop-only" onclick="openDocumentForm()">＋ ثبت سند</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-page="dashboard" onclick="showPage('dashboard')">⌂ داشبورد</button>
+    <button class="tab" data-page="documents" onclick="showPage('documents')">▤ اسناد</button>
+    <button class="tab" data-page="accounts" onclick="showPage('accounts')">◉ معین</button>
+    <button class="tab" data-page="details" onclick="showPage('details')">◎ تفصیلی</button>
+  </nav>
+
+  <main class="container">
+
+    <!-- Dashboard -->
+    <section id="page-dashboard" class="page active">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">DASHBOARD</span>
+          <h1>داشبورد مالی</h1>
+          <p id="connectionStatus">در حال اتصال...</p>
+        </div>
+        <button class="primary-btn mobile-only" onclick="openDocumentForm()">＋ ثبت سند</button>
+      </div>
+
+      <div class="cards">
+        <div class="stat-card accent-blue">
+          <div class="stat-icon">▤</div>
+          <div>
+            <span>تعداد اسناد</span>
+            <strong id="statDocs">0</strong>
+          </div>
+        </div>
+        <div class="stat-card accent-green">
+          <div class="stat-icon">↗</div>
+          <div>
+            <span>جمع بدهکار</span>
+            <strong id="statDebit">0</strong>
+          </div>
+        </div>
+        <div class="stat-card accent-red">
+          <div class="stat-icon">↙</div>
+          <div>
+            <span>جمع بستانکار</span>
+            <strong id="statCredit">0</strong>
+          </div>
+        </div>
+        <div class="stat-card accent-dark">
+          <div class="stat-icon">⚡</div>
+          <div>
+            <span>مانده کل</span>
+            <strong id="statBalance">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>آخرین اسناد</h2>
+              <span>آخرین ثبت‌های مالی</span>
+            </div>
+            <button class="text-btn" onclick="showPage('documents')">مشاهده همه ←</button>
+          </div>
+          <div id="recentDocs" class="recent-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>حساب‌های منتخب</h2>
+              <span>مانده حساب‌ها</span>
+            </div>
+          </div>
+          <div id="accountSnapshot" class="snapshot-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Documents -->
+    <section id="page-documents" class="page">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">DOCUMENTS</span>
+          <h1>اسناد مالی</h1>
+          <p>ثبت، مشاهده و مدیریت اسناد</p>
+        </div>
+        <button class="primary-btn" onclick="openDocumentForm()">＋ ثبت سند جدید</button>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input id="docSearch" type="text" placeholder="جستجو در اسناد..." oninput="renderDocuments()">
+        </div>
+        <button class="ghost-btn" onclick="clearDocumentSearch()">پاک کردن</button>
+      </div>
+
+      <div class="summary-bar" id="docSummary"></div>
+
+      <div class="panel table-panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>شماره</th>
+                <th>تاریخ</th>
+                <th>معین</th>
+                <th>تفصیلی</th>
+                <th>بدهکار</th>
+                <th>بستانکار</th>
+                <th>شرح</th>
+                <th>عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="documentsBody"></tbody>
+          </table>
+          <div id="documentsMobile" class="mobile-cards"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Accounts -->
+    <section id="page-accounts" class="page">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">ACCOUNTS</span>
+          <h1>دفاتر معین</h1>
+          <p>مدیریت دفاتر معین</p>
+        </div>
+        <button class="primary-btn" onclick="openAccountForm()">＋ دفتر معین</button>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input id="accountSearch" type="text" placeholder="جستجو در دفاتر معین..." oninput="renderAccounts()">
+        </div>
+        <button class="ghost-btn" onclick="clearAccountSearch()">پاک کردن</button>
+      </div>
+
+      <div class="summary-bar" id="accountSummary"></div>
+
+      <div class="cards mini-cards" id="accountCards"></div>
+
+      <div class="panel table-panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>دفتر معین</th>
+                <th>بدهکار</th>
+                <th>بستانکار</th>
+                <th>مانده</th>
+                <th>تعداد سند</th>
+                <th>عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="accountsBody"></tbody>
+          </table>
+          <div id="accountsMobile" class="mobile-cards"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Details -->
+    <section id="page-details" class="page">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">DETAILS</span>
+          <h1>دفاتر تفصیلی</h1>
+          <p>مدیریت تفصیلی‌ها</p>
+        </div>
+        <button class="primary-btn" onclick="openDetailForm()">＋ تفصیلی</button>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input id="detailSearch" type="text" placeholder="جستجو در تفصیلی‌ها..." oninput="renderDetails()">
+        </div>
+        <button class="ghost-btn" onclick="clearDetailSearch()">پاک کردن</button>
+      </div>
+
+      <div class="summary-bar" id="detailSummary"></div>
+
+      <div class="panel table-panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>دفتر معین</th>
+                <th>دفتر تفصیلی</th>
+                <th>ملاحظات</th>
+                <th>بدهکار</th>
+                <th>بستانکار</th>
+                <th>مانده</th>
+                <th>عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="detailsBody"></tbody>
+          </table>
+          <div id="detailsMobile" class="mobile-cards"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Document Modal -->
+  <div id="documentModal" class="modal">
+    <div class="modal-card modal-wide">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">FINANCIAL ENTRY</span>
+          <h2 id="documentModalTitle">ثبت سند جدید</h2>
+        </div>
+        <button class="close-btn" onclick="closeModal('documentModal')">×</button>
+      </div>
+
+      <form id="documentForm" onsubmit="saveDocument(event)">
+        <input type="hidden" id="docRow">
+        <div class="form-grid">
+          <label>
+            <span>شماره سند</span>
+            <input id="docNumber" type="text" readonly class="readonly">
+          </label>
+          <label>
+            <span>تاریخ <small>(متنی)</small></span>
+            <input id="docDate" type="text" placeholder="1405-05-26" autocomplete="off">
+          </label>
+          <label>
+            <span>دفتر معین</span>
+            <select id="docAccount" onchange="onAccountChange()"></select>
+          </label>
+          <label>
+            <span>دفتر تفصیلی</span>
+            <select id="docDetail" onchange="onDetailChange()"></select>
+          </label>
+        </div>
+
+        <div class="balance-preview">
+          <div class="balance-box">
+            <span>مانده معین</span>
+            <strong id="selectedAccountBalance">0</strong>
+          </div>
+          <div class="balance-box">
+            <span>مانده تفصیلی</span>
+            <strong id="selectedDetailBalance">0</strong>
+          </div>
+        </div>
+
+        <div class="form-grid amounts">
+          <label>
+            <span>بدهکار</span>
+            <div class="money-input">
+              <input id="docDebit" inputmode="numeric" placeholder="0" oninput="formatMoneyInput(this)">
+              <b>ریال</b>
+            </div>
+          </label>
+          <label>
+            <span>بستانکار</span>
+            <div class="money-input">
+              <input id="docCredit" inputmode="numeric" placeholder="0" oninput="formatMoneyInput(this)">
+              <b>ریال</b>
+            </div>
+          </label>
+          <label class="full">
+            <span>شرح</span>
+            <textarea id="docDescription" rows="3" placeholder="شرح سند..."></textarea>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="ghost-btn" onclick="closeModal('documentModal')">انصراف</button>
+          <button type="submit" class="primary-btn" id="documentSaveBtn">ثبت سند</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Account Modal -->
+  <div id="accountModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">ACCOUNT</span>
+          <h2 id="accountModalTitle">دفتر معین جدید</h2>
+        </div>
+        <button class="close-btn" onclick="closeModal('accountModal')">×</button>
+      </div>
+      <form onsubmit="saveAccount(event)">
+        <input type="hidden" id="accountOldName">
+        <label>
+          <span>نام دفتر معین</span>
+          <input id="accountName" type="text" required placeholder="مثلاً خرید قطعات">
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="ghost-btn" onclick="closeModal('accountModal')">انصراف</button>
+          <button type="submit" class="primary-btn">ذخیره</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">DETAIL</span>
+          <h2 id="detailModalTitle">تفصیلی جدید</h2>
+        </div>
+        <button class="close-btn" onclick="closeModal('detailModal')">×</button>
+      </div>
+      <form onsubmit="saveDetail(event)">
+        <input type="hidden" id="detailOldAccount">
+        <input type="hidden" id="detailOldName">
+        <input type="hidden" id="detailOldNote">
+
+        <label>
+          <span>دفتر معین</span>
+          <select id="detailAccount" required></select>
+        </label>
+        <label>
+          <span>دفتر تفصیلی</span>
+          <input id="detailName" type="text" required placeholder="نام تفصیلی">
+        </label>
+        <label>
+          <span>ملاحظات</span>
+          <textarea id="detailNote" rows="3" placeholder="ملاحظات اختیاری"></textarea>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="ghost-btn" onclick="closeModal('detailModal')">انصراف</button>
+          <button type="submit" class="primary-btn">ذخیره</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-card delete-modal-card">
+      <div class="delete-icon">🗑</div>
+      <h3 id="deleteTitle">حذف رکورد</h3>
+      <p id="deleteMessage">آیا از حذف این رکورد مطمئن هستید؟</p>
+      <div class="delete-actions">
+        <button class="btn-cancel" onclick="closeModal('deleteModal')">انصراف</button>
+        <button class="btn-danger" id="deleteConfirmBtn" onclick="confirmDelete()">حذف</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading" class="loading-overlay">
+    <div class="loader"></div>
+    <span>در حال دریافت اطلاعات...</span>
+  </div>
+
+<script>
+let appData = {
+  accounts: [],
+  details: [],
+  documents: []
+};
+
+let currentEdit = null;
+let busy = false;
+let deleteTarget = null;
+
+const $ = id => document.getElementById(id);
+
+function showLoading(show = true) {
+  $('loading').classList.toggle('show', show);
+}
+
+function toast(message, type = 'success') {
+  const el = $('toast');
+  el.textContent = message;
+  el.className = 'toast show ' + type;
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => el.className = 'toast', 3000);
+}
+
+function normalizeDigits(value) {
+  return String(value ?? '')
+    .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+}
+
+function parseMoney(value) {
+  const n = normalizeDigits(value).replace(/,/g, '').replace(/[^\d.-]/g, '');
+  return Number(n) || 0;
+}
+
+function formatMoney(value) {
+  const n = Number(value) || 0;
+  return new Intl.NumberFormat('en-US').format(Math.round(n));
+}
+
+function formatMoneyFa(value) {
+  return formatMoney(value).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+function formatMoneyInput(input) {
+  const value = parseMoney(input.value);
+  input.value = value ? formatMoney(value) : '';
+}
+
+function moneyClass(value) {
+  return Number(value) >= 0 ? 'positive' : 'negative';
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  updateThemeIcon(next);
+}
+
+function updateThemeIcon(theme) {
+  const btn = $('themeToggle');
+  if (btn) btn.textContent = theme === 'dark' ? '☀' : '🌙';
+}
+
+function rowClass(value) {
+  return Number(value) >= 0 ? 'row-credit' : 'row-debit';
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+  }[c]));
+}
+
+function callServer(fn, args = []) {
+  return new Promise((resolve, reject) => {
+    const runner = google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(err => reject(err));
+    runner[fn](...args);
+  });
+}
+
+async function refreshData(silent = false) {
+  if (busy) return;
+  busy = true;
+  if (!silent) showLoading(true);
+
+  try {
+    appData = await callServer('getAppData');
+    renderAll();
+    $('connectionStatus') && ($('connectionStatus').textContent =
+      `اتصال برقرار است · ${appData.documents.length} سند · ${appData.accounts.length} معین · ${appData.details.length} تفصیلی`);
+  } catch (err) {
+    console.error(err);
+    $('connectionStatus') && ($('connectionStatus').textContent = 'اتصال برقرار نشد');
+    toast(err.message || 'خطا در دریافت اطلاعات', 'error');
+  } finally {
+    busy = false;
+    showLoading(false);
+  }
+}
+
+function renderAll() {
+  renderDashboard();
+  renderDocuments();
+  renderAccounts();
+  renderDetails();
+  populateAccountSelects();
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  $('page-' + page).classList.add('active');
+  document.querySelector(`.tab[data-page="${page}"]`)?.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function calculateStats() {
+  let debit = 0, credit = 0;
+  appData.documents.forEach(d => {
+    debit += Number(d.debit) || 0;
+    credit += Number(d.credit) || 0;
+  });
+  return { debit, credit, balance: debit - credit };
+}
+
+function getAccountStats(name) {
+  let debit = 0, credit = 0, count = 0;
+  appData.documents.forEach(d => {
+    if (d.account === name) {
+      debit += Number(d.debit) || 0;
+      credit += Number(d.credit) || 0;
+      count++;
+    }
+  });
+  return { debit, credit, balance: debit - credit, count };
+}
+
+function getDetailStats(account, detail) {
+  let debit = 0, credit = 0, count = 0;
+  appData.documents.forEach(d => {
+    if (d.account === account && d.detail === detail) {
+      debit += Number(d.debit) || 0;
+      credit += Number(d.credit) || 0;
+      count++;
+    }
+  });
+  return { debit, credit, balance: debit - credit, count };
+}
+
+function renderDashboard() {
+  const s = calculateStats();
+  $('statDocs').textContent = formatMoney(appData.documents.length);
+  $('statDebit').textContent = formatMoney(s.debit);
+  $('statCredit').textContent = formatMoney(s.credit);
+  $('statBalance').textContent = formatMoney(s.balance);
+
+  const recent = [...appData.documents].reverse().slice(0, 7);
+  $('recentDocs').innerHTML = recent.length ? recent.map(d => `
+    <div class="recent-item">
+      <div class="doc-badge">${escapeHtml(d.number)}</div>
+      <div class="recent-main">
+        <strong>${escapeHtml(d.account)}</strong>
+        <span>${escapeHtml(d.detail)} · ${escapeHtml(d.date)}</span>
+      </div>
+      <div class="recent-amount ${d.debit > 0 ? 'debit' : 'credit'}">
+        ${formatMoney(d.debit || d.credit)}
+        <small>${d.debit > 0 ? 'بدهکار' : 'بستانکار'}</small>
+      </div>
+    </div>
+  `).join('') : emptyState('هنوز سندی ثبت نشده است');
+
+  $('accountSnapshot').innerHTML = appData.accounts.slice(0, 7).map(a => {
+    const s = getAccountStats(a);
+    return `
+      <div class="snapshot-item">
+        <div class="avatar">${escapeHtml(a.substring(0, 1))}</div>
+        <div class="snapshot-main">
+          <strong>${escapeHtml(a)}</strong>
+          <span>${s.count} سند</span>
+        </div>
+        <b class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</b>
+      </div>
+    `;
+  }).join('') || emptyState('دفتر معینی ثبت نشده است');
+}
+
+function renderDocuments() {
+  const q = normalizeDigits($('docSearch')?.value || '').trim().toLowerCase();
+  const filtered = appData.documents.filter(d => {
+    if (!q) return true;
+    return [d.number, d.date, d.account, d.detail, d.description]
+      .some(x => String(x ?? '').toLowerCase().includes(q));
+  });
+
+  // Summary
+  let debit = 0, credit = 0;
+  filtered.forEach(d => {
+    debit += Number(d.debit) || 0;
+    credit += Number(d.credit) || 0;
+  });
+  $('docSummary').innerHTML = `
+    <div class="summary-item">
+      <span>تعداد اسناد</span>
+      <strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>جمع بدهکار</span>
+      <strong class="debit">${formatMoney(debit)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>جمع بستانکار</span>
+      <strong class="credit">${formatMoney(credit)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>مانده</span>
+      <strong class="${moneyClass(debit - credit)}">${formatMoney(debit - credit)}</strong>
+    </div>
+  `;
+
+  // Table
+  $('documentsBody').innerHTML = filtered.length ? filtered.map(d => `
+    <tr class="${d.debit > 0 ? 'row-debit' : 'row-credit'}">
+      <td><span class="doc-number">${escapeHtml(d.number)}</span></td>
+      <td class="date-cell">${escapeHtml(d.date)}</td>
+      <td><b>${escapeHtml(d.account)}</b></td>
+      <td>${escapeHtml(d.detail)}</td>
+      <td class="money debit">${d.debit ? formatMoney(d.debit) : '—'}</td>
+      <td class="money credit">${d.credit ? formatMoney(d.credit) : '—'}</td>
+      <td class="description-cell">${escapeHtml(d.description)}</td>
+      <td class="actions">
+        <button class="small-btn edit" onclick="editDocument(${d.row})">✎ ویرایش</button>
+        <button class="small-btn delete" onclick="showDeleteModal('document', ${d.row}, 'سند شماره ${d.number}')">🗑 حذف</button>
+      </td>
+    </tr>
+  `).join('') : `<tr><td colspan="8">${emptyState('سندی پیدا نشد')}</td></tr>`;
+
+  // Mobile Cards
+  $('documentsMobile').innerHTML = filtered.length ? filtered.map(d => `
+    <div class="mobile-card ${d.debit > 0 ? 'row-debit' : 'row-credit'}">
+      <div class="mobile-card-header">
+        <span class="mobile-card-title">سند ${escapeHtml(d.number)}</span>
+        <span class="mobile-card-badge">${escapeHtml(d.date)}</span>
+      </div>
+      <div class="mobile-card-body">
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">دفتر معین</span>
+          <span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.account)}</span>
+        </div>
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">دفتر تفصیلی</span>
+          <span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.detail)}</span>
+        </div>
+        <div class="mobile-card-amounts">
+          <div class="mobile-card-amount-box is-debit">
+            <span>↑ بدهکار</span>
+            <strong class="debit">${d.debit ? formatMoney(d.debit) : '—'}</strong>
+          </div>
+          <div class="mobile-card-amount-box is-credit">
+            <span>↓ بستانکار</span>
+            <strong class="credit">${d.credit ? formatMoney(d.credit) : '—'}</strong>
+          </div>
+        </div>
+        ${d.description ? `
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">شرح</span>
+          <span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.description)}</span>
+        </div>` : ''}
+        <div class="mobile-card-actions">
+          <button class="small-btn edit" onclick="editDocument(${d.row})">✎ ویرایش</button>
+          <button class="small-btn delete" onclick="showDeleteModal('document', ${d.row}, 'سند شماره ${d.number}')">🗑 حذف</button>
+        </div>
+      </div>
+    </div>
+  `).join('') : emptyState('سندی پیدا نشد');
+}
+
+function renderAccounts() {
+  const q = normalizeDigits($('accountSearch')?.value || '').trim().toLowerCase();
+  const totals = appData.accounts
+    .filter(a => !q || a.toLowerCase().includes(q))
+    .map(a => ({name:a, ...getAccountStats(a)}));
+
+  // Summary
+  let debit = 0, credit = 0;
+  totals.forEach(a => {
+    debit += a.debit;
+    credit += a.credit;
+  });
+  $('accountSummary').innerHTML = `
+    <div class="summary-item">
+      <span>تعداد معین</span>
+      <strong style="color:var(--blue)">${formatMoney(totals.length)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>جمع بدهکار</span>
+      <strong class="debit">${formatMoney(debit)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>جمع بستانکار</span>
+      <strong class="credit">${formatMoney(credit)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>مانده کل</span>
+      <strong class="${moneyClass(debit - credit)}">${formatMoney(debit - credit)}</strong>
+    </div>
+  `;
+
+  // Cards
+  $('accountCards').innerHTML = totals.slice(0, 4).map(a => `
+    <div class="stat-card compact">
+      <div class="stat-icon">◉</div>
+      <div>
+        <span>${escapeHtml(a.name)}</span>
+        <strong>${formatMoney(a.balance)}</strong>
+        <small>${a.count} سند</small>
+      </div>
+    </div>
+  `).join('');
+
+  // Table
+  $('accountsBody').innerHTML = totals.length ? totals.map((a, i) => `
+    <tr class="${rowClass(a.balance)}">
+      <td>${i + 1}</td>
+      <td><b>${escapeHtml(a.name)}</b></td>
+      <td class="money debit">${formatMoney(a.debit)}</td>
+      <td class="money credit">${formatMoney(a.credit)}</td>
+      <td class="money ${moneyClass(a.balance)}">${formatMoney(a.balance)}</td>
+      <td>${formatMoney(a.count)}</td>
+      <td class="actions">
+        <button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button>
+        <button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'دفتر معین «${a.name}»')">🗑 حذف</button>
+      </td>
+    </tr>
+  `).join('') : `<tr><td colspan="7">${emptyState('دفتر معینی ثبت نشده است')}</td></tr>`;
+
+  // Mobile Cards
+  $('accountsMobile').innerHTML = totals.length ? totals.map((a, i) => `
+    <div class="mobile-card ${rowClass(a.balance)}">
+      <div class="mobile-card-header">
+        <span class="mobile-card-title">${escapeHtml(a.name)}</span>
+        <span class="mobile-card-badge">${a.count} سند</span>
+      </div>
+      <div class="mobile-card-body">
+        <div class="mobile-card-amounts">
+          <div class="mobile-card-amount-box is-debit">
+            <span>↑ بدهکار</span>
+            <strong class="debit">${formatMoney(a.debit)}</strong>
+          </div>
+          <div class="mobile-card-amount-box is-credit">
+            <span>↓ بستانکار</span>
+            <strong class="credit">${formatMoney(a.credit)}</strong>
+          </div>
+        </div>
+        <div class="mobile-card-balance">
+          <span>مانده حساب</span>
+          <strong class="${moneyClass(a.balance)}">${formatMoney(a.balance)}</strong>
+        </div>
+        <div class="mobile-card-actions">
+          <button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button>
+          <button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'دفتر معین «${a.name}»')">🗑 حذف</button>
+        </div>
+      </div>
+    </div>
+  `).join('') : emptyState('دفتر معینی ثبت نشده است');
+}
+
+function renderDetails() {
+  const q = normalizeDigits($('detailSearch')?.value || '').trim().toLowerCase();
+  const filtered = appData.details.filter(d => {
+    if (!q) return true;
+    return [d.account, d.name, d.note].some(x => String(x ?? '').toLowerCase().includes(q));
+  });
+
+  // Summary
+  let debit = 0, credit = 0;
+  filtered.forEach(d => {
+    const s = getDetailStats(d.account, d.name);
+    debit += s.debit;
+    credit += s.credit;
+  });
+  $('detailSummary').innerHTML = `
+    <div class="summary-item">
+      <span>تعداد تفصیلی</span>
+      <strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>جمع بدهکار</span>
+      <strong class="debit">${formatMoney(debit)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>جمع بستانکار</span>
+      <strong class="credit">${formatMoney(credit)}</strong>
+    </div>
+    <div class="summary-item">
+      <span>مانده کل</span>
+      <strong class="${moneyClass(debit - credit)}">${formatMoney(debit - credit)}</strong>
+    </div>
+  `;
+
+  // Table
+  $('detailsBody').innerHTML = filtered.length ? filtered.map((d, i) => {
+    const s = getDetailStats(d.account, d.name);
+    return `
+      <tr class="${rowClass(s.balance)}">
+        <td>${i + 1}</td>
+        <td><b>${escapeHtml(d.account)}</b></td>
+        <td>${escapeHtml(d.name)}</td>
+        <td>${escapeHtml(d.note)}</td>
+        <td class="money debit">${formatMoney(s.debit)}</td>
+        <td class="money credit">${formatMoney(s.credit)}</td>
+        <td class="money ${moneyClass(s.balance)}">${formatMoney(s.balance)}</td>
+        <td class="actions">
+          <button class="small-btn edit" onclick="editDetail(${d.row})">✎ ویرایش</button>
+          <button class="small-btn delete" onclick="showDeleteModal('detail', ${d.row}, 'تفصیلی «${d.name}»')">🗑 حذف</button>
+        </td>
+      </tr>
+    `;
+  }).join('') : `<tr><td colspan="8">${emptyState('تفصیلی ثبت نشده است')}</td></tr>`;
+
+  // Mobile Cards
+  $('detailsMobile').innerHTML = filtered.length ? filtered.map((d, i) => {
+    const s = getDetailStats(d.account, d.name);
+    return `
+      <div class="mobile-card ${rowClass(s.balance)}">
+        <div class="mobile-card-header">
+          <span class="mobile-card-title">${escapeHtml(d.name)}</span>
+          <span class="mobile-card-badge">${escapeHtml(d.account)}</span>
+        </div>
+        <div class="mobile-card-body">
+          ${d.note ? `
+          <div class="mobile-card-row">
+            <span class="mobile-card-label">ملاحظات</span>
+            <span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.note)}</span>
+          </div>` : ''}
+          <div class="mobile-card-amounts">
+            <div class="mobile-card-amount-box is-debit">
+              <span>↑ بدهکار</span>
+              <strong class="debit">${formatMoney(s.debit)}</strong>
+            </div>
+            <div class="mobile-card-amount-box is-credit">
+              <span>↓ بستانکار</span>
+              <strong class="credit">${formatMoney(s.credit)}</strong>
+            </div>
+          </div>
+          <div class="mobile-card-balance">
+            <span>مانده تفصیلی</span>
+            <strong class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</strong>
+          </div>
+          <div class="mobile-card-actions">
+            <button class="small-btn edit" onclick="editDetail(${d.row})">✎ ویرایش</button>
+            <button class="small-btn delete" onclick="showDeleteModal('detail', ${d.row}, 'تفصیلی «${d.name}»')">🗑 حذف</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('') : emptyState('تفصیلی ثبت نشده است');
+}
+
+function emptyState(text) {
+  return `<div class="empty-state"><div>⌁</div><span>${text}</span></div>`;
+}
+
+function populateAccountSelects() {
+  const accountOptions = '<option value="">انتخاب دفتر معین</option>' +
+    appData.accounts.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
+  $('docAccount').innerHTML = accountOptions;
+  $('detailAccount').innerHTML = accountOptions;
+  updateDetailOptions();
+}
+
+function updateDetailOptions(selected = '') {
+  const account = $('docAccount').value;
+  const list = appData.details.filter(d => d.account === account);
+  $('docDetail').innerHTML = '<option value="">انتخاب دفتر تفصیلی</option>' +
+    list.map(d => `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)}</option>`).join('');
+  if (selected) $('docDetail').value = selected;
+}
+
+function onAccountChange() {
+  updateDetailOptions();
+  updateSelectedBalances();
+}
+
+function onDetailChange() {
+  updateSelectedBalances();
+}
+
+function updateSelectedBalances() {
+  const account = $('docAccount').value;
+  const detail = $('docDetail').value;
+  const a = account ? getAccountStats(account) : {balance:0};
+  const d = account && detail ? getDetailStats(account, detail) : {balance:0};
+  $('selectedAccountBalance').textContent = formatMoney(a.balance);
+  $('selectedDetailBalance').textContent = formatMoney(d.balance);
+  $('selectedAccountBalance').className = moneyClass(a.balance);
+  $('selectedDetailBalance').className = moneyClass(d.balance);
+}
+
+function openDocumentForm(data = null) {
+  currentEdit = data ? {type:'document', row:data.row} : null;
+  $('documentForm').reset();
+  $('docRow').value = data ? data.row : '';
+  $('documentModalTitle').textContent = data ? 'ویرایش سند' : 'ثبت سند جدید';
+  $('documentSaveBtn').textContent = data ? 'ذخیره تغییرات' : 'ثبت سند';
+  $('docNumber').value = data ? data.number : 'در حال دریافت...';
+
+  if (data) {
+    $('docDate').value = data.date;
+    $('docAccount').value = data.account;
+    updateDetailOptions(data.detail);
+    $('docDebit').value = data.debit ? formatMoney(data.debit) : '';
+    $('docCredit').value = data.credit ? formatMoney(data.credit) : '';
+    $('docDescription').value = data.description;
+  } else {
+    updateDetailOptions();
+    $('docDate').value = '';
+    $('docDebit').value = '';
+    $('docCredit').value = '';
+    $('docDescription').value = '';
+    callServer('getNextDocumentNumber').then(n => $('docNumber').value = n);
+  }
+  updateSelectedBalances();
+  openModal('documentModal');
+  setTimeout(() => $('docDate').focus(), 150);
+}
+
+async function saveDocument(e) {
+  e.preventDefault();
+
+  const debit = parseMoney($('docDebit').value);
+  const credit = parseMoney($('docCredit').value);
+  const data = {
+    row: Number($('docRow').value) || 0,
+    number: $('docNumber').value,
+    date: $('docDate').value.trim(),
+    account: $('docAccount').value,
+    detail: $('docDetail').value,
+    debit,
+    credit,
+    description: $('docDescription').value.trim()
+  };
+
+  if (!data.date) return toast('تاریخ را وارد کنید', 'error');
+  if (!data.account) return toast('دفتر معین را انتخاب کنید', 'error');
+  if (!data.detail) return toast('دفتر تفصیلی را انتخاب کنید', 'error');
+  if (debit === 0 && credit === 0) return toast('حداقل یکی از بدهکار یا بستانکار را وارد کنید', 'error');
+  if (debit > 0 && credit > 0) return toast('در یک سند همزمان بدهکار و بستانکار را وارد نکنید', 'error');
+
+  setBusyButton('documentSaveBtn', true);
+  try {
+    await callServer(data.row ? 'updateDocument' : 'addDocument', [data]);
+    closeModal('documentModal');
+    toast(data.row ? 'سند با موفقیت ویرایش شد' : 'سند با موفقیت ثبت شد');
+    await refreshData(true);
+  } catch (err) {
+    toast(err.message || 'خطا در ذخیره سند', 'error');
+  } finally {
+    setBusyButton('documentSaveBtn', false);
+  }
+}
+
+function editDocument(row) {
+  const d = appData.documents.find(x => Number(x.row) === Number(row));
+  if (d) openDocumentForm(d);
+}
+
+function openAccountForm(name = '') {
+  $('accountModalTitle').textContent = name ? 'ویرایش دفتر معین' : 'دفتر معین جدید';
+  $('accountOldName').value = name;
+  $('accountName').value = name;
+  openModal('accountModal');
+  setTimeout(() => $('accountName').focus(), 150);
+}
+
+async function saveAccount(e) {
+  e.preventDefault();
+  const oldName = $('accountOldName').value;
+  const name = $('accountName').value.trim();
+  if (!name) return;
+
+  showLoading(true);
+  try {
+    if (oldName) {
+      await callServer('updateAccount', [decodeURIComponent(oldName), name]);
+      toast('دفتر معین ویرایش شد');
+    } else {
+      await callServer('addAccount', [name]);
+      toast('دفتر معین اضافه شد');
+    }
+    closeModal('accountModal');
+    await refreshData(true);
+  } catch (err) {
+    toast(err.message || 'خطا در ذخیره دفتر معین', 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+function editAccount(encoded) {
+  openAccountForm(decodeURIComponent(encoded));
+}
+
+function openDetailForm(data = null) {
+  $('detailModalTitle').textContent = data ? 'ویرایش تفصیلی' : 'تفصیلی جدید';
+  $('detailOldAccount').value = data ? data.account : '';
+  $('detailOldName').value = data ? data.name : '';
+  $('detailOldNote').value = data ? data.note : '';
+  $('detailAccount').value = data ? data.account : '';
+  $('detailName').value = data ? data.name : '';
+  $('detailNote').value = data ? data.note : '';
+  openModal('detailModal');
+  setTimeout(() => $('detailName').focus(), 150);
+}
+
+async function saveDetail(e) {
+  e.preventDefault();
+  const oldAccount = $('detailOldAccount').value;
+  const oldName = $('detailOldName').value;
+  const oldNote = $('detailOldNote').value;
+
+  const data = {
+    account: $('detailAccount').value,
+    name: $('detailName').value.trim(),
+    note: $('detailNote').value.trim()
+  };
+
+  if (!data.account) return toast('دفتر معین را انتخاب کنید', 'error');
+  if (!data.name) return toast('نام تفصیلی را وارد کنید', 'error');
+
+  showLoading(true);
+  try {
+    if (oldName) {
+      await callServer('updateDetail', [oldAccount, oldName, oldNote, data]);
+      toast('تفصیلی ویرایش شد');
+    } else {
+      await callServer('addDetail', [data]);
+      toast('تفصیلی اضافه شد');
+    }
+    closeModal('detailModal');
+    await refreshData(true);
+  } catch (err) {
+    toast(err.message || 'خطا در ذخیره تفصیلی', 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+function editDetail(row) {
+  const d = appData.details.find(x => Number(x.row) === Number(row));
+  if (d) openDetailForm(d);
+}
+
+// ========== DELETE MODAL ==========
+function showDeleteModal(type, target, title) {
+  deleteTarget = {type, target};
+  $('deleteTitle').textContent = title;
+
+  if (type === 'document') {
+    const d = appData.documents.find(x => Number(x.row) === Number(target));
+    $('deleteMessage').textContent = `آیا از حذف سند شماره ${d.number} مطمئن هستید؟ این عمل قابل بازگشت نیست.`;
+  } else if (type === 'account') {
+    const name = decodeURIComponent(target);
+    $('deleteMessage').textContent = `آیا از حذف دفتر معین «${name}» مطمئن هستید؟`;
+  } else if (type === 'detail') {
+    const d = appData.details.find(x => Number(x.row) === Number(target));
+    $('deleteMessage').textContent = `آیا از حذف تفصیلی «${d.name}» مطمئن هستید؟`;
+  }
+
+  openModal('deleteModal');
+}
+
+async function confirmDelete() {
+  if (!deleteTarget) return;
+
+  const {type, target} = deleteTarget;
+  closeModal('deleteModal');
+  showLoading(true);
+
+  try {
+    if (type === 'document') {
+      await callServer('deleteDocument', [target]);
+      toast('سند حذف شد');
+    } else if (type === 'account') {
+      await callServer('deleteAccount', [decodeURIComponent(target)]);
+      toast('دفتر معین حذف شد');
+    } else if (type === 'detail') {
+      await callServer('deleteDetail', [target]);
+      toast('تفصیلی حذف شد');
+    }
+    await refreshData(true);
+  } catch (err) {
+    toast(err.message || 'خطا در حذف', 'error');
+  } finally {
+    showLoading(false);
+    deleteTarget = null;
+  }
+}
+
+function openModal(id) {
+  $(id).classList.add('show');
+  document.body.classList.add('modal-open');
+}
+
+function closeModal(id) {
+  $(id).classList.remove('show');
+  document.body.classList.remove('modal-open');
+}
+
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeModal(modal.id);
+  });
+});
+
+function clearDocumentSearch() {
+  $('docSearch').value = '';
+  renderDocuments();
+}
+
+function clearAccountSearch() {
+  $('accountSearch').value = '';
+  renderAccounts();
+}
+
+function clearDetailSearch() {
+  $('detailSearch').value = '';
+  renderDetails();
+}
+
+function setBusyButton(id, busy) {
+  const btn = $(id);
+  if (!btn) return;
+  btn.disabled = busy;
+  btn.dataset.oldText ??= btn.textContent;
+  btn.textContent = busy ? 'در حال ذخیره...' : btn.dataset.oldText;
+}
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal.show').forEach(m => closeModal(m.id));
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateThemeIcon(document.documentElement.getAttribute('data-theme') || 'dark');
+  refreshData();
+});
+</script>
+</body>
+</html>
+  
+  <script>
+    // JavaScript آفلاین با IndexedDB
+  </script>
+</body>
+</html>
