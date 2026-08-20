@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" data-theme="dark">
+<html lang="fa" dir="rtl" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>قطعات یدکی موتور سیکلت پالس - نسخه خصوصی</title>
-  <meta name="theme-color" content="#0a0b0d">
+  <meta name="theme-color" content="#f6f4ef">
   <meta name="description" content="سیستم حسابداری خصوصی قطعات یدکی موتور سیکلت پالس">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="پالس">
+  <link rel="manifest" href="data:application/json,{}">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
@@ -75,6 +80,7 @@
       background:var(--bg);
       color:var(--text);
       min-height:100vh;
+      min-height:100dvh;
       font-size:14.5px;
       line-height:1.65;
       -webkit-font-smoothing:antialiased;
@@ -114,6 +120,8 @@
       position:sticky;
       top:0;
       z-index:50;
+      padding-top:env(safe-area-inset-top);
+      height:calc(64px + env(safe-area-inset-top));
     }
 
     .brand{display:flex;align-items:center;gap:12px}
@@ -141,6 +149,7 @@
       padding:0 24px;
       position:sticky;
       top:64px;
+      top:calc(64px + env(safe-area-inset-top));
       z-index:45;
       overflow-x:auto;
       scrollbar-width:none;
@@ -459,14 +468,14 @@
     @media(max-width:700px){
       body{font-size:13.5px}
 
-      .topbar{height:58px;padding:0 14px}
+      .topbar{height:58px;padding:0 14px;padding-top:env(safe-area-inset-top);height:calc(58px + env(safe-area-inset-top))}
       .brand-title{font-size:13px}
       .brand-subtitle{font-size:8.5px}
       .brand-mark{width:36px;height:36px;font-size:17px}
 
       .top-actions .primary-btn{display:none}
 
-      .tabs{height:48px;top:58px;padding:0 8px;gap:3px}
+      .tabs{height:48px;top:58px;top:calc(58px + env(safe-area-inset-top));padding:0 8px;gap:3px}
       .tab{padding:0 12px;font-size:10.5px;height:34px}
 
       .container{padding:16px 12px 28px}
@@ -606,7 +615,7 @@
       </div>
     </div>
     <div class="top-actions">
-      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="تغییر پوسته">☀</button>
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="تغییر پوسته">🌙</button>
       <button class="icon-btn" onclick="exportData()" title="پشتیبان‌گیری">💾</button>
       <button class="icon-btn" onclick="document.getElementById('importFile').click()" title="بازیابی">📂</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this.files[0])">
@@ -1148,18 +1157,32 @@
 
     function moneyClass(value) { return Number(value) >= 0 ? 'positive' : 'negative'; }
 
+    // ✅ ذخیره و بازیابی تم از localStorage
     function toggleTheme() {
       const html = document.documentElement;
-      const current = html.getAttribute('data-theme') || 'dark';
+      const current = html.getAttribute('data-theme') || 'light';
       const next = current === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      updateThemeIcon(next);
+      applyTheme(next);
+    }
+
+    function applyTheme(theme) {
+      const html = document.documentElement;
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      updateThemeIcon(theme);
+      updateThemeColor(theme);
     }
 
     function updateThemeIcon(theme) { 
       const btn = $('themeToggle');
       if (btn) btn.textContent = theme === 'dark' ? '☀' : '🌙'; 
+    }
+
+    function updateThemeColor(theme) {
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', theme === 'dark' ? '#0a0b0d' : '#f6f4ef');
+      }
     }
 
     function rowClass(value) { return Number(value) >= 0 ? 'row-credit' : 'row-debit'; }
@@ -1365,7 +1388,6 @@
       setBusyButton('documentSaveBtn', true);
       try {
         if(id > 0) {
-          // ✅ اصلاح: فقط فیلدهای داده را آپدیت کن
           await updateRecord('documents', id, data);
         } else {
           await addRecord('documents', data);
@@ -1393,7 +1415,6 @@
         if(oldName){
           const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===oldName);
           if(account){ 
-            // ✅ اصلاح: فقط نام را آپدیت کن
             await updateRecord('accounts', account.id, {name: name});
             const details = await getAllRecords('details'); const documents = await getAllRecords('documents');
             for(const detail of details){ if(detail.account===oldName){ await updateRecord('details', detail.id, {account: name}); } }
@@ -1428,7 +1449,6 @@
         if(oldName){
           const details = await getAllRecords('details'); const detail = details.find(d=>d.account===oldAccount && d.name===oldName && d.note===oldNote);
           if(detail){ 
-            // ✅ اصلاح: فقط فیلدهای داده را آپدیت کن
             await updateRecord('details', detail.id, data); 
             if(oldAccount!==data.account || oldName!==data.name){ 
               const documents = await getAllRecords('documents'); 
@@ -1509,8 +1529,11 @@
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
       try{
+        // ✅ بارگذاری تم ذخیره شده یا پیش‌فرض روشن
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+        
         await openDB();
-        updateThemeIcon(document.documentElement.getAttribute('data-theme') || 'dark');
         await refreshData();
       } catch(error){ console.error('Failed to initialize:', error); toast('خطا در راه‌اندازی برنامه','error'); }
     });
