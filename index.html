@@ -10,11 +10,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="پالس">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="icon-192.png">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <!-- Manifest به صورت inline -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"قطعات یدکی موتور سیکلت پالس","short_name":"پالس","description":"سیستم حسابداری خصوصی","start_url":".","display":"standalone","background_color":"%23f6f4ef","theme_color":"%23f6f4ef","orientation":"portrait","dir":"rtl","lang":"fa","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%23d98c4a%22/%3E%3Ctext x=%22256%22 y=%22320%22 font-size=%22250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22%3E🏍%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any"}]}'>
+  
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%23d98c4a%22/%3E%3Ctext x=%22256%22 y=%22320%22 font-size=%22250%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22%3E🏍%3C/text%3E%3C/svg%3E">
+  
   <style>
-    /* تمام استایل‌های CSS همان است که قبلاً فرستادم */
     @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
     :root{
@@ -605,6 +607,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="toast" class="toast"></div>
 
@@ -830,7 +833,7 @@
     </section>
   </main>
 
-  <!-- Document Modal -->
+  <!-- Modals -->
   <div id="documentModal" class="modal">
     <div class="modal-card modal-wide">
       <div class="modal-head">
@@ -902,7 +905,6 @@
     </div>
   </div>
 
-  <!-- Account Modal -->
   <div id="accountModal" class="modal">
     <div class="modal-card">
       <div class="modal-head">
@@ -926,7 +928,6 @@
     </div>
   </div>
 
-  <!-- Detail Modal -->
   <div id="detailModal" class="modal">
     <div class="modal-card">
       <div class="modal-head">
@@ -962,7 +963,6 @@
     </div>
   </div>
 
-  <!-- Delete Confirmation Modal -->
   <div id="deleteModal" class="modal">
     <div class="modal-card delete-modal-card">
       <div class="delete-icon">🗑</div>
@@ -982,12 +982,11 @@
 
   <script>
     // ============================================
-    // Persian Calendar (Jalali) utility
+    // Persian Calendar
     // ============================================
     function getTodayJalali() {
       const now = new Date();
-      const gregorian = { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate() };
-      return gregorianToJalali(gregorian.y, gregorian.m, gregorian.d);
+      return gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
     }
 
     function gregorianToJalali(gy, gm, gd) {
@@ -1000,17 +999,14 @@
       days %= 12053;
       jy += 4 * Math.floor(days / 1461);
       days %= 1461;
-      if (days > 365) {
-        jy += Math.floor((days - 1) / 365);
-        days = (days - 1) % 365;
-      }
+      if (days > 365) { jy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
       const jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
       const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
       return `${jy}-${String(jm).padStart(2, '0')}-${String(jd).padStart(2, '0')}`;
     }
 
     // ============================================
-    // Database Setup - IndexedDB (Private Mode)
+    // IndexedDB
     // ============================================
     let db;
     const DB_NAME = 'PulsePartsDB_Private';
@@ -1019,21 +1015,17 @@
     function openDB() {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
-        
         request.onupgradeneeded = (event) => {
           const db = event.target.result;
-          
           if (!db.objectStoreNames.contains('accounts')) {
             const store = db.createObjectStore('accounts', { keyPath: 'id', autoIncrement: true });
             store.createIndex('name', 'name', { unique: true });
           }
-          
           if (!db.objectStoreNames.contains('details')) {
             const store = db.createObjectStore('details', { keyPath: 'id', autoIncrement: true });
             store.createIndex('account', 'account', { unique: false });
             store.createIndex('name', 'name', { unique: false });
           }
-          
           if (!db.objectStoreNames.contains('documents')) {
             const store = db.createObjectStore('documents', { keyPath: 'id', autoIncrement: true });
             store.createIndex('number', 'number', { unique: false });
@@ -1042,15 +1034,8 @@
             store.createIndex('date', 'date', { unique: false });
           }
         };
-        
-        request.onsuccess = (event) => {
-          db = event.target.result;
-          resolve(db);
-        };
-        
-        request.onerror = (event) => {
-          reject(event.target.error);
-        };
+        request.onsuccess = (event) => { db = event.target.result; resolve(db); };
+        request.onerror = (event) => reject(event.target.error);
       });
     }
 
@@ -1074,24 +1059,20 @@
       });
     }
 
-    // ✅ تابع اصلاح شده برای ویرایش رکورد
     function updateRecord(storeName, id, data) {
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
-        
-        // ابتدا رکورد موجود را دریافت کن
         const getRequest = store.get(id);
         getRequest.onsuccess = () => {
           const existingRecord = getRequest.result;
           if (existingRecord) {
-            // فقط فیلدهای داده را به‌روزرسانی کن، نه کلید را
             const updatedRecord = { ...existingRecord, ...data, id: id };
             const putRequest = store.put(updatedRecord);
             putRequest.onsuccess = () => resolve(putRequest.result);
             putRequest.onerror = () => reject(putRequest.error);
           } else {
-            reject(new Error('رکورد مورد نظر یافت نشد'));
+            reject(new Error('رکورد یافت نشد'));
           }
         };
         getRequest.onerror = () => reject(getRequest.error);
@@ -1119,10 +1100,9 @@
     }
 
     // ============================================
-    // Application State
+    // App State
     // ============================================
     let appData = { accounts: [], details: [], documents: [] };
-    let currentEdit = null;
     let busy = false;
     let deleteTarget = null;
 
@@ -1143,13 +1123,11 @@
     }
 
     function parseMoney(value) {
-      const n = normalizeDigits(value).replace(/,/g, '').replace(/[^\d.-]/g, '');
-      return Number(n) || 0;
+      return Number(normalizeDigits(value).replace(/,/g, '').replace(/[^\d.-]/g, '')) || 0;
     }
 
     function formatMoney(value) {
-      const n = Number(value) || 0;
-      return new Intl.NumberFormat('en-US').format(Math.round(n));
+      return new Intl.NumberFormat('en-US').format(Math.round(Number(value) || 0));
     }
 
     function formatMoneyInput(input) {
@@ -1159,32 +1137,19 @@
 
     function moneyClass(value) { return Number(value) >= 0 ? 'positive' : 'negative'; }
 
-    // ✅ ذخیره و بازیابی تم از localStorage
     function toggleTheme() {
       const html = document.documentElement;
       const current = html.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
+      applyTheme(current === 'dark' ? 'light' : 'dark');
     }
 
     function applyTheme(theme) {
-      const html = document.documentElement;
-      html.setAttribute('data-theme', theme);
+      document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
-      updateThemeIcon(theme);
-      updateThemeColor(theme);
-    }
-
-    function updateThemeIcon(theme) { 
       const btn = $('themeToggle');
-      if (btn) btn.textContent = theme === 'dark' ? '☀' : '🌙'; 
-    }
-
-    function updateThemeColor(theme) {
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', theme === 'dark' ? '#0a0b0d' : '#f6f4ef');
-      }
+      if (btn) btn.textContent = theme === 'dark' ? '☀' : '🌙';
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', theme === 'dark' ? '#0a0b0d' : '#f6f4ef');
     }
 
     function rowClass(value) { return Number(value) >= 0 ? 'row-credit' : 'row-debit'; }
@@ -1249,10 +1214,7 @@
       $('recentDocs').innerHTML = recent.length ? recent.map(d => `
         <div class="recent-item">
           <div class="doc-badge">${escapeHtml(d.number)}</div>
-          <div class="recent-main">
-            <strong>${escapeHtml(d.account)}</strong>
-            <span>${escapeHtml(d.detail)} · ${escapeHtml(d.date)}</span>
-          </div>
+          <div class="recent-main"><strong>${escapeHtml(d.account)}</strong><span>${escapeHtml(d.detail)} · ${escapeHtml(d.date)}</span></div>
           <div class="recent-amount ${d.debit > 0 ? 'debit' : 'credit'}">${formatMoney(d.debit || d.credit)}<small>${d.debit > 0 ? 'بدهکار' : 'بستانکار'}</small></div>
         </div>`).join('') : emptyState('هنوز سندی ثبت نشده است');
 
@@ -1281,18 +1243,18 @@
           <td class="money debit">${d.debit?formatMoney(d.debit):'—'}</td>
           <td class="money credit">${d.credit?formatMoney(d.credit):'—'}</td>
           <td class="description-cell">${escapeHtml(d.description)}</td>
-          <td class="actions"><button class="small-btn edit" onclick="editDocument(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند شماره ${d.number}')">🗑 حذف</button></td>
+          <td class="actions"><button class="small-btn edit" onclick="editDocument(${d.id})">✎</button><button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند ${d.number}')">🗑</button></td>
         </tr>`).join('') : `<tr><td colspan="8">${emptyState('سندی پیدا نشد')}</td></tr>`;
 
       $('documentsMobile').innerHTML = filtered.length ? filtered.map(d => `
         <div class="mobile-card ${d.debit>0?'row-debit':'row-credit'}">
           <div class="mobile-card-header"><span class="mobile-card-title">سند ${escapeHtml(d.number)}</span><span class="mobile-card-badge">${escapeHtml(d.date)}</span></div>
           <div class="mobile-card-body">
-            <div class="mobile-card-row"><span class="mobile-card-label">دفتر معین</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.account)}</span></div>
-            <div class="mobile-card-row"><span class="mobile-card-label">دفتر تفصیلی</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.detail)}</span></div>
+            <div class="mobile-card-row"><span class="mobile-card-label">معین</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.account)}</span></div>
+            <div class="mobile-card-row"><span class="mobile-card-label">تفصیلی</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.detail)}</span></div>
             <div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${d.debit?formatMoney(d.debit):'—'}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${d.credit?formatMoney(d.credit):'—'}</strong></div></div>
             ${d.description?`<div class="mobile-card-row"><span class="mobile-card-label">شرح</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.description)}</span></div>`:''}
-            <div class="mobile-card-actions"><button class="small-btn edit" onclick="editDocument(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند شماره ${d.number}')">🗑 حذف</button></div>
+            <div class="mobile-card-actions"><button class="small-btn edit" onclick="editDocument(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('document', ${d.id}, 'سند ${d.number}')">🗑 حذف</button></div>
           </div>
         </div>`).join('') : emptyState('سندی پیدا نشد');
     }
@@ -1303,8 +1265,8 @@
       let debit=0, credit=0; totals.forEach(a => { debit += a.debit; credit += a.credit; });
       $('accountSummary').innerHTML = `<div class="summary-item"><span>تعداد معین</span><strong style="color:var(--blue)">${formatMoney(totals.length)}</strong></div><div class="summary-item"><span>جمع بدهکار</span><strong class="debit">${formatMoney(debit)}</strong></div><div class="summary-item"><span>جمع بستانکار</span><strong class="credit">${formatMoney(credit)}</strong></div><div class="summary-item"><span>مانده کل</span><strong class="${moneyClass(debit-credit)}">${formatMoney(debit-credit)}</strong></div>`;
       $('accountCards').innerHTML = totals.slice(0,4).map(a => `<div class="stat-card compact"><div class="stat-icon">◉</div><div><span>${escapeHtml(a.name)}</span><strong>${formatMoney(a.balance)}</strong><small>${a.count} سند</small></div></div>`).join('');
-      $('accountsBody').innerHTML = totals.length ? totals.map((a,i)=>`<tr class="${rowClass(a.balance)}"><td>${i+1}</td><td><b>${escapeHtml(a.name)}</b></td><td class="money debit">${formatMoney(a.debit)}</td><td class="money credit">${formatMoney(a.credit)}</td><td class="money ${moneyClass(a.balance)}">${formatMoney(a.balance)}</td><td>${formatMoney(a.count)}</td><td class="actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'دفتر معین «${a.name}»')">🗑 حذف</button></td></tr>`).join('') : `<tr><td colspan="7">${emptyState('دفتر معینی ثبت نشده است')}</td></tr>`;
-      $('accountsMobile').innerHTML = totals.length ? totals.map((a,i)=>`<div class="mobile-card ${rowClass(a.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(a.name)}</span><span class="mobile-card-badge">${a.count} سند</span></div><div class="mobile-card-body"><div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${formatMoney(a.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${formatMoney(a.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده حساب</span><strong class="${moneyClass(a.balance)}">${formatMoney(a.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'دفتر معین «${a.name}»')">🗑 حذف</button></div></div></div>`).join('') : emptyState('دفتر معینی ثبت نشده است');
+      $('accountsBody').innerHTML = totals.length ? totals.map((a,i)=>`<tr class="${rowClass(a.balance)}"><td>${i+1}</td><td><b>${escapeHtml(a.name)}</b></td><td class="money debit">${formatMoney(a.debit)}</td><td class="money credit">${formatMoney(a.credit)}</td><td class="money ${moneyClass(a.balance)}">${formatMoney(a.balance)}</td><td>${formatMoney(a.count)}</td><td class="actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎</button><button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'معین «${a.name}»')">🗑</button></td></tr>`).join('') : `<tr><td colspan="7">${emptyState('دفتر معینی ثبت نشده')}</td></tr>`;
+      $('accountsMobile').innerHTML = totals.length ? totals.map((a,i)=>`<div class="mobile-card ${rowClass(a.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(a.name)}</span><span class="mobile-card-badge">${a.count} سند</span></div><div class="mobile-card-body"><div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${formatMoney(a.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${formatMoney(a.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده</span><strong class="${moneyClass(a.balance)}">${formatMoney(a.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editAccount('${encodeURIComponent(a.name)}')">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('account', '${encodeURIComponent(a.name)}', 'معین «${a.name}»')">🗑 حذف</button></div></div></div>`).join('') : emptyState('دفتر معینی ثبت نشده');
     }
 
     function renderDetails() {
@@ -1312,8 +1274,8 @@
       const filtered = appData.details.filter(d => !q || [d.account, d.name, d.note].some(x=>String(x??'').toLowerCase().includes(q)));
       let debit=0, credit=0; filtered.forEach(d => { const s = getDetailStats(d.account, d.name); debit += s.debit; credit += s.credit; });
       $('detailSummary').innerHTML = `<div class="summary-item"><span>تعداد تفصیلی</span><strong style="color:var(--blue)">${formatMoney(filtered.length)}</strong></div><div class="summary-item"><span>جمع بدهکار</span><strong class="debit">${formatMoney(debit)}</strong></div><div class="summary-item"><span>جمع بستانکار</span><strong class="credit">${formatMoney(credit)}</strong></div><div class="summary-item"><span>مانده کل</span><strong class="${moneyClass(debit-credit)}">${formatMoney(debit-credit)}</strong></div>`;
-      $('detailsBody').innerHTML = filtered.length ? filtered.map((d,i)=>{ const s = getDetailStats(d.account,d.name); return `<tr class="${rowClass(s.balance)}"><td>${i+1}</td><td><b>${escapeHtml(d.account)}</b></td><td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.note)}</td><td class="money debit">${formatMoney(s.debit)}</td><td class="money credit">${formatMoney(s.credit)}</td><td class="money ${moneyClass(s.balance)}">${formatMoney(s.balance)}</td><td class="actions"><button class="small-btn edit" onclick="editDetail(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑 حذف</button></td></tr>`; }).join('') : `<tr><td colspan="8">${emptyState('تفصیلی ثبت نشده است')}</td></tr>`;
-      $('detailsMobile').innerHTML = filtered.length ? filtered.map((d,i)=>{ const s = getDetailStats(d.account,d.name); return `<div class="mobile-card ${rowClass(s.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(d.name)}</span><span class="mobile-card-badge">${escapeHtml(d.account)}</span></div><div class="mobile-card-body">${d.note?`<div class="mobile-card-row"><span class="mobile-card-label">ملاحظات</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.note)}</span></div>`:''}<div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${formatMoney(s.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${formatMoney(s.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده تفصیلی</span><strong class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editDetail(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑 حذف</button></div></div></div>`; }).join('') : emptyState('تفصیلی ثبت نشده است');
+      $('detailsBody').innerHTML = filtered.length ? filtered.map((d,i)=>{ const s = getDetailStats(d.account,d.name); return `<tr class="${rowClass(s.balance)}"><td>${i+1}</td><td><b>${escapeHtml(d.account)}</b></td><td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.note)}</td><td class="money debit">${formatMoney(s.debit)}</td><td class="money credit">${formatMoney(s.credit)}</td><td class="money ${moneyClass(s.balance)}">${formatMoney(s.balance)}</td><td class="actions"><button class="small-btn edit" onclick="editDetail(${d.id})">✎</button><button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑</button></td></tr>`; }).join('') : `<tr><td colspan="8">${emptyState('تفصیلی ثبت نشده')}</td></tr>`;
+      $('detailsMobile').innerHTML = filtered.length ? filtered.map((d,i)=>{ const s = getDetailStats(d.account,d.name); return `<div class="mobile-card ${rowClass(s.balance)}"><div class="mobile-card-header"><span class="mobile-card-title">${escapeHtml(d.name)}</span><span class="mobile-card-badge">${escapeHtml(d.account)}</span></div><div class="mobile-card-body">${d.note?`<div class="mobile-card-row"><span class="mobile-card-label">ملاحظات</span><span class="mobile-card-value" style="font-family:var(--font-ui)">${escapeHtml(d.note)}</span></div>`:''}<div class="mobile-card-amounts"><div class="mobile-card-amount-box is-debit"><span>↑ بدهکار</span><strong class="debit">${formatMoney(s.debit)}</strong></div><div class="mobile-card-amount-box is-credit"><span>↓ بستانکار</span><strong class="credit">${formatMoney(s.credit)}</strong></div></div><div class="mobile-card-balance"><span>مانده</span><strong class="${moneyClass(s.balance)}">${formatMoney(s.balance)}</strong></div><div class="mobile-card-actions"><button class="small-btn edit" onclick="editDetail(${d.id})">✎ ویرایش</button><button class="small-btn delete" onclick="showDeleteModal('detail', ${d.id}, 'تفصیلی «${d.name}»')">🗑 حذف</button></div></div></div>`; }).join('') : emptyState('تفصیلی ثبت نشده');
     }
 
     function emptyState(text){ return `<div class="empty-state"><div>⌁</div><span>${text}</span></div>`; }
@@ -1346,12 +1308,11 @@
     }
 
     async function openDocumentForm(data=null) {
-      currentEdit = data ? {type:'document', id:data.id} : null;
       $('documentForm').reset();
       $('docRow').value = data ? data.id : '';
       $('documentModalTitle').textContent = data ? 'ویرایش سند' : 'ثبت سند جدید';
       $('documentSaveBtn').textContent = data ? 'ذخیره تغییرات' : 'ثبت سند';
-      $('docNumber').value = data ? data.number : 'در حال دریافت...';
+      $('docNumber').value = data ? data.number : '...';
 
       if(data) {
         $('docDate').value = data.date;
@@ -1362,7 +1323,6 @@
         $('docDescription').value = data.description;
       } else {
         updateDetailOptions();
-        // ✅ تاریخ شمسی خودکار
         $('docDate').value = getTodayJalali();
         $('docDebit').value = ''; $('docCredit').value = ''; $('docDescription').value = '';
         const documents = await getAllRecords('documents');
@@ -1384,19 +1344,16 @@
       if(!data.date) return toast('تاریخ را وارد کنید', 'error');
       if(!data.account) return toast('دفتر معین را انتخاب کنید', 'error');
       if(!data.detail) return toast('دفتر تفصیلی را انتخاب کنید', 'error');
-      if(debit === 0 && credit === 0) return toast('حداقل یکی از بدهکار یا بستانکار را وارد کنید', 'error');
-      if(debit > 0 && credit > 0) return toast('در یک سند همزمان بدهکار و بستانکار را وارد نکنید', 'error');
+      if(debit === 0 && credit === 0) return toast('بدهکار یا بستانکار را وارد کنید', 'error');
+      if(debit > 0 && credit > 0) return toast('فقط یکی را وارد کنید', 'error');
       
       setBusyButton('documentSaveBtn', true);
       try {
-        if(id > 0) {
-          await updateRecord('documents', id, data);
-        } else {
-          await addRecord('documents', data);
-        }
+        if(id > 0) { await updateRecord('documents', id, data); }
+        else { await addRecord('documents', data); }
         closeModal('documentModal'); toast(id > 0 ? 'سند ویرایش شد' : 'سند ثبت شد');
         await refreshData(true);
-      } catch(err){ toast(err.message || 'خطا در ذخیره سند', 'error'); }
+      } catch(err){ toast(err.message || 'خطا', 'error'); }
       finally{ setBusyButton('documentSaveBtn', false); }
     }
 
@@ -1417,18 +1374,18 @@
         if(oldName){
           const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===oldName);
           if(account){ 
-            await updateRecord('accounts', account.id, {name: name});
+            await updateRecord('accounts', account.id, {name});
             const details = await getAllRecords('details'); const documents = await getAllRecords('documents');
-            for(const detail of details){ if(detail.account===oldName){ await updateRecord('details', detail.id, {account: name}); } }
-            for(const doc of documents){ if(doc.account===oldName){ await updateRecord('documents', doc.id, {account: name}); } }
+            for(const detail of details){ if(detail.account===oldName){ await updateRecord('details', detail.id, {account:name}); } }
+            for(const doc of documents){ if(doc.account===oldName){ await updateRecord('documents', doc.id, {account:name}); } }
           }
           toast('دفتر معین ویرایش شد');
         } else {
-          const accounts = await getAllRecords('accounts'); if(accounts.some(a=>a.name===name)) throw new Error('این دفتر معین قبلاً ثبت شده است');
+          const accounts = await getAllRecords('accounts'); if(accounts.some(a=>a.name===name)) throw new Error('تکراری است');
           await addRecord('accounts', {name}); toast('دفتر معین اضافه شد');
         }
         closeModal('accountModal'); await refreshData(true);
-      } catch(err){ toast(err.message || 'خطا در ذخیره دفتر معین','error'); } finally{ showLoading(false); }
+      } catch(err){ toast(err.message || 'خطا','error'); } finally{ showLoading(false); }
     }
 
     function editAccount(encoded){ openAccountForm(decodeURIComponent(encoded)); }
@@ -1444,8 +1401,8 @@
       e.preventDefault();
       const oldAccount = $('detailOldAccount').value, oldName = $('detailOldName').value, oldNote = $('detailOldNote').value;
       const data = { account: $('detailAccount').value, name: $('detailName').value.trim(), note: $('detailNote').value.trim() };
-      if(!data.account) return toast('دفتر معین را انتخاب کنید','error');
-      if(!data.name) return toast('نام تفصیلی را وارد کنید','error');
+      if(!data.account) return toast('معین را انتخاب کنید','error');
+      if(!data.name) return toast('نام را وارد کنید','error');
       showLoading(true);
       try{
         if(oldName){
@@ -1459,20 +1416,20 @@
           }
           toast('تفصیلی ویرایش شد');
         } else {
-          const details = await getAllRecords('details'); if(details.some(d=>d.account===data.account && d.name===data.name)) throw new Error('این تفصیلی قبلاً ثبت شده است');
+          const details = await getAllRecords('details'); if(details.some(d=>d.account===data.account && d.name===data.name)) throw new Error('تکراری است');
           await addRecord('details', data); toast('تفصیلی اضافه شد');
         }
         closeModal('detailModal'); await refreshData(true);
-      } catch(err){ toast(err.message || 'خطا در ذخیره تفصیلی','error'); } finally{ showLoading(false); }
+      } catch(err){ toast(err.message || 'خطا','error'); } finally{ showLoading(false); }
     }
 
     function editDetail(id){ const d = appData.details.find(x=>Number(x.id)===Number(id)); if(d) openDetailForm(d); }
 
     function showDeleteModal(type, target, title){
       deleteTarget = {type, target}; $('deleteTitle').textContent = title;
-      if(type === 'document'){ const d = appData.documents.find(x=>Number(x.id)===Number(target)); $('deleteMessage').textContent = `آیا از حذف سند شماره ${d.number} مطمئن هستید؟ این عمل قابل بازگشت نیست.`; }
-      else if(type === 'account'){ const name = decodeURIComponent(target); $('deleteMessage').textContent = `آیا از حذف دفتر معین «${name}» مطمئن هستید؟`; }
-      else if(type === 'detail'){ const d = appData.details.find(x=>Number(x.id)===Number(target)); $('deleteMessage').textContent = `آیا از حذف تفصیلی «${d.name}» مطمئن هستید؟`; }
+      if(type === 'document'){ const d = appData.documents.find(x=>Number(x.id)===Number(target)); $('deleteMessage').textContent = `حذف سند ${d.number}؟`; }
+      else if(type === 'account'){ const name = decodeURIComponent(target); $('deleteMessage').textContent = `حذف معین «${name}»؟`; }
+      else if(type === 'detail'){ const d = appData.details.find(x=>Number(x.id)===Number(target)); $('deleteMessage').textContent = `حذف تفصیلی «${d.name}»؟`; }
       openModal('deleteModal');
     }
 
@@ -1481,10 +1438,10 @@
       const {type, target} = deleteTarget; closeModal('deleteModal'); showLoading(true);
       try{
         if(type === 'document'){ await deleteRecord('documents', target); toast('سند حذف شد'); }
-        else if(type === 'account'){ const name = decodeURIComponent(target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===name)) throw new Error('این دفتر معین دارای سند است'); const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===name); if(account) await deleteRecord('accounts', account.id); toast('دفتر معین حذف شد'); }
-        else if(type === 'detail'){ const details = await getAllRecords('details'); const detail = details.find(d=>d.id===target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===detail.account && d.detail===detail.name)) throw new Error('این تفصیلی دارای سند است'); await deleteRecord('details', target); toast('تفصیلی حذف شد'); }
+        else if(type === 'account'){ const name = decodeURIComponent(target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===name)) throw new Error('دارای سند است'); const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===name); if(account) await deleteRecord('accounts', account.id); toast('معین حذف شد'); }
+        else if(type === 'detail'){ const details = await getAllRecords('details'); const detail = details.find(d=>d.id===target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===detail.account && d.detail===detail.name)) throw new Error('دارای سند است'); await deleteRecord('details', target); toast('تفصیلی حذف شد'); }
         await refreshData(true);
-      } catch(err){ toast(err.message || 'خطا در حذف','error'); } finally{ showLoading(false); deleteTarget = null; }
+      } catch(err){ toast(err.message || 'خطا','error'); } finally{ showLoading(false); deleteTarget = null; }
     }
 
     function openModal(id){ $(id).classList.add('show'); document.body.classList.add('modal-open'); }
@@ -1496,19 +1453,16 @@
     function clearAccountSearch(){ $('accountSearch').value=''; renderAccounts(); }
     function clearDetailSearch(){ $('detailSearch').value=''; renderDetails(); }
 
-    function setBusyButton(id, busy){ const btn = $(id); if(!btn) return; btn.disabled = busy; if(!btn.dataset.oldText) btn.dataset.oldText = btn.textContent; btn.textContent = busy ? 'در حال ذخیره...' : btn.dataset.oldText; }
+    function setBusyButton(id, busy){ const btn = $(id); if(!btn) return; btn.disabled = busy; if(!btn.dataset.oldText) btn.dataset.oldText = btn.textContent; btn.textContent = busy ? '...' : btn.dataset.oldText; }
 
     window.addEventListener('keydown', e => { if(e.key === 'Escape') document.querySelectorAll('.modal.show').forEach(m => closeModal(m.id)); });
 
-    // ============================================
-    // Export/Import (Private - only this device)
-    // ============================================
     async function exportData(){
       try{
         const data = { version:1, exportedAt:new Date().toISOString(), accounts:await getAllRecords('accounts'), details:await getAllRecords('details'), documents:await getAllRecords('documents') };
         const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`pulse-parts-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url);
-        toast('پشتیبان‌گیری با موفقیت انجام شد');
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`pulse-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url);
+        toast('پشتیبان‌گیری انجام شد');
       } catch(error){ toast('خطا در پشتیبان‌گیری','error'); }
     }
 
@@ -1516,28 +1470,25 @@
       if(!file) return;
       try{
         const text = await file.text(); const data = JSON.parse(text);
-        if(!data.accounts || !data.details || !data.documents) throw new Error('فایل پشتیبان نامعتبر است');
-        if(!confirm('داده‌های موجود پاک می‌شوند. ادامه می‌دهید؟')) return;
+        if(!data.accounts || !data.details || !data.documents) throw new Error('فایل نامعتبر');
+        if(!confirm('داده‌ها پاک شوند؟')) return;
         showLoading(true);
         await clearStore('accounts'); await clearStore('details'); await clearStore('documents');
         for(const account of data.accounts){ await addRecord('accounts', {name:account.name}); }
         for(const detail of data.details){ await addRecord('details', {account:detail.account, name:detail.name, note:detail.note||''}); }
         for(const doc of data.documents){ await addRecord('documents', {number:doc.number, date:doc.date, account:doc.account, detail:doc.detail, debit:doc.debit, credit:doc.credit, description:doc.description||''}); }
-        await refreshData(true); toast('داده‌ها با موفقیت بازیابی شدند');
-      } catch(error){ toast('خطا در بازیابی داده‌ها: '+error.message,'error'); }
+        await refreshData(true); toast('بازیابی انجام شد');
+      } catch(error){ toast('خطا: '+error.message,'error'); }
       finally{ showLoading(false); $('importFile').value=''; }
     }
 
-    // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
       try{
-        // ✅ بارگذاری تم ذخیره شده یا پیش‌فرض روشن
         const savedTheme = localStorage.getItem('theme') || 'light';
         applyTheme(savedTheme);
-        
         await openDB();
         await refreshData();
-      } catch(error){ console.error('Failed to initialize:', error); toast('خطا در راه‌اندازی برنامه','error'); }
+      } catch(error){ console.error(error); toast('خطا در راه‌اندازی','error'); }
     });
   </script>
 </body>
