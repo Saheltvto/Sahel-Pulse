@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>قطعات یدکی موتور سیکلت پالس - نسخه آفلاین</title>
+  <title>قطعات یدکی موتور سیکلت پالس - نسخه خصوصی</title>
   <meta name="theme-color" content="#0a0b0d">
-  <link rel="manifest" href="manifest.json">
-  <meta name="description" content="سیستم حسابداری آفلاین قطعات یدکی موتور سیکلت پالس با قابلیت نصب PWA و همگام‌سازی خودکار.">
+  <meta name="description" content="سیستم حسابداری خصوصی قطعات یدکی موتور سیکلت پالس">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
@@ -603,7 +602,7 @@
       <div class="brand-mark">🏍</div>
       <div>
         <div class="brand-title">قطعات یدکی موتور سیکلت پالس</div>
-        <div class="brand-subtitle">سیستم حسابداری آفلاین + PWA</div>
+        <div class="brand-subtitle">سیستم حسابداری خصوصی</div>
       </div>
     </div>
     <div class="top-actions">
@@ -629,7 +628,7 @@
         <div>
           <span class="eyebrow">DASHBOARD</span>
           <h1>داشبورد مالی</h1>
-          <p id="connectionStatus">آفلاین - داده‌ها در مرورگر ذخیره می‌شوند</p>
+          <p id="connectionStatus">حالت خصوصی - داده‌ها فقط روی همین دستگاه</p>
         </div>
         <button class="primary-btn mobile-only" onclick="openDocumentForm()">＋ ثبت سند</button>
       </div>
@@ -976,11 +975,7 @@
     // ============================================
     function getTodayJalali() {
       const now = new Date();
-      const gregorian = {
-        y: now.getFullYear(),
-        m: now.getMonth() + 1,
-        d: now.getDate()
-      };
+      const gregorian = { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate() };
       return gregorianToJalali(gregorian.y, gregorian.m, gregorian.d);
     }
 
@@ -1004,10 +999,10 @@
     }
 
     // ============================================
-    // Database Setup - IndexedDB
+    // Database Setup - IndexedDB (Private Mode)
     // ============================================
     let db;
-    const DB_NAME = 'PulsePartsDB';
+    const DB_NAME = 'PulsePartsDB_Private';
     const DB_VERSION = 1;
 
     function openDB() {
@@ -1105,7 +1100,6 @@
     let currentEdit = null;
     let busy = false;
     let deleteTarget = null;
-    let syncChannel = null;
 
     const $ = id => document.getElementById(id);
 
@@ -1170,7 +1164,7 @@
         ]);
         appData = { accounts: accounts.map(a => a.name), details, documents };
         renderAll();
-        $('connectionStatus').textContent = `آفلاین · ${documents.length} سند · ${accounts.length} معین · ${details.length} تفصیلی · همگام‌سازی فعال`;
+        $('connectionStatus').textContent = `حالت خصوصی · ${documents.length} سند · ${accounts.length} معین · ${details.length} تفصیلی`;
       } catch (err) { console.error(err); toast('خطا در خواندن داده‌ها', 'error'); }
       finally { busy = false; showLoading(false); }
     }
@@ -1355,7 +1349,6 @@
       try {
         if(data.id){ await updateRecord('documents', data.id, data); } else { await addRecord('documents', data); }
         closeModal('documentModal'); toast(data.id ? 'سند ویرایش شد' : 'سند ثبت شد');
-        broadcastSync({type:'documents'});
         await refreshData(true);
       } catch(err){ toast(err.message || 'خطا در ذخیره سند', 'error'); }
       finally{ setBusyButton('documentSaveBtn', false); }
@@ -1387,7 +1380,7 @@
           const accounts = await getAllRecords('accounts'); if(accounts.some(a=>a.name===name)) throw new Error('این دفتر معین قبلاً ثبت شده است');
           await addRecord('accounts', {name}); toast('دفتر معین اضافه شد');
         }
-        closeModal('accountModal'); broadcastSync({type:'accounts'}); await refreshData(true);
+        closeModal('accountModal'); await refreshData(true);
       } catch(err){ toast(err.message || 'خطا در ذخیره دفتر معین','error'); } finally{ showLoading(false); }
     }
 
@@ -1416,7 +1409,7 @@
           const details = await getAllRecords('details'); if(details.some(d=>d.account===data.account && d.name===data.name)) throw new Error('این تفصیلی قبلاً ثبت شده است');
           await addRecord('details', data); toast('تفصیلی اضافه شد');
         }
-        closeModal('detailModal'); broadcastSync({type:'details'}); await refreshData(true);
+        closeModal('detailModal'); await refreshData(true);
       } catch(err){ toast(err.message || 'خطا در ذخیره تفصیلی','error'); } finally{ showLoading(false); }
     }
 
@@ -1437,7 +1430,7 @@
         if(type === 'document'){ await deleteRecord('documents', target); toast('سند حذف شد'); }
         else if(type === 'account'){ const name = decodeURIComponent(target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===name)) throw new Error('این دفتر معین دارای سند است'); const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===name); if(account) await deleteRecord('accounts', account.id); toast('دفتر معین حذف شد'); }
         else if(type === 'detail'){ const details = await getAllRecords('details'); const detail = details.find(d=>d.id===target); const documents = await getAllRecords('documents'); if(documents.some(d=>d.account===detail.account && d.detail===detail.name)) throw new Error('این تفصیلی دارای سند است'); await deleteRecord('details', target); toast('تفصیلی حذف شد'); }
-        broadcastSync({type:'documents'}); await refreshData(true);
+        await refreshData(true);
       } catch(err){ toast(err.message || 'خطا در حذف','error'); } finally{ showLoading(false); deleteTarget = null; }
     }
 
@@ -1455,38 +1448,8 @@
     window.addEventListener('keydown', e => { if(e.key === 'Escape') document.querySelectorAll('.modal.show').forEach(m => closeModal(m.id)); });
 
     // ============================================
-    // PWA: Service Worker Registration
+    // Export/Import (Private - only this device)
     // ============================================
-    if('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW registration failed:', err));
-      });
-    }
-
-    // ============================================
-    // Multi-device sync (BroadcastChannel + storage event)
-    // ============================================
-    function broadcastSync(payload) {
-      try {
-        if (!syncChannel) syncChannel = new BroadcastChannel('pulse_sync_channel');
-        syncChannel.postMessage({ ...payload, timestamp: Date.now() });
-      } catch(e) {}
-    }
-
-    function initSyncListener() {
-      if('BroadcastChannel' in window) {
-        syncChannel = new BroadcastChannel('pulse_sync_channel');
-        syncChannel.onmessage = (event) => {
-          console.log('Sync message received:', event.data);
-          refreshData(true);
-        };
-      }
-      window.addEventListener('storage', (e) => {
-        if(e.key && e.key.startsWith('pulse_sync_')) refreshData(true);
-      });
-    }
-
-    // Export/Import
     async function exportData(){
       try{
         const data = { version:1, exportedAt:new Date().toISOString(), accounts:await getAllRecords('accounts'), details:await getAllRecords('details'), documents:await getAllRecords('documents') };
@@ -1507,7 +1470,7 @@
         for(const account of data.accounts){ await addRecord('accounts', {name:account.name}); }
         for(const detail of data.details){ await addRecord('details', {account:detail.account, name:detail.name, note:detail.note||''}); }
         for(const doc of data.documents){ await addRecord('documents', {number:doc.number, date:doc.date, account:doc.account, detail:doc.detail, debit:doc.debit, credit:doc.credit, description:doc.description||''}); }
-        broadcastSync({type:'import'}); await refreshData(true); toast('داده‌ها با موفقیت بازیابی شدند');
+        await refreshData(true); toast('داده‌ها با موفقیت بازیابی شدند');
       } catch(error){ toast('خطا در بازیابی داده‌ها: '+error.message,'error'); }
       finally{ showLoading(false); $('importFile').value=''; }
     }
@@ -1518,7 +1481,6 @@
         await openDB();
         updateThemeIcon(document.documentElement.getAttribute('data-theme') || 'dark');
         await refreshData();
-        initSyncListener();
       } catch(error){ console.error('Failed to initialize:', error); toast('خطا در راه‌اندازی برنامه','error'); }
     });
   </script>
