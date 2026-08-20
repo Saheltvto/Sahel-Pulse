@@ -1063,13 +1063,27 @@
       });
     }
 
+    // ✅ تابع اصلاح شده برای ویرایش رکورد
     function updateRecord(storeName, id, data) {
       return new Promise((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readwrite');
         const store = transaction.objectStore(storeName);
-        const request = store.put({ ...data, id: id });
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+        
+        // ابتدا رکورد موجود را دریافت کن
+        const getRequest = store.get(id);
+        getRequest.onsuccess = () => {
+          const existingRecord = getRequest.result;
+          if (existingRecord) {
+            // فقط فیلدهای داده را به‌روزرسانی کن، نه کلید را
+            const updatedRecord = { ...existingRecord, ...data, id: id };
+            const putRequest = store.put(updatedRecord);
+            putRequest.onsuccess = () => resolve(putRequest.result);
+            putRequest.onerror = () => reject(putRequest.error);
+          } else {
+            reject(new Error('رکورد مورد نظر یافت نشد'));
+          }
+        };
+        getRequest.onerror = () => reject(getRequest.error);
       });
     }
 
@@ -1339,16 +1353,24 @@
     async function saveDocument(e){
       e.preventDefault();
       const debit = parseMoney($('docDebit').value), credit = parseMoney($('docCredit').value);
-      const data = { id: Number($('docRow').value)||0, number: $('docNumber').value, date: $('docDate').value.trim(), account: $('docAccount').value, detail: $('docDetail').value, debit, credit, description: $('docDescription').value.trim() };
+      const data = { number: $('docNumber').value, date: $('docDate').value.trim(), account: $('docAccount').value, detail: $('docDetail').value, debit, credit, description: $('docDescription').value.trim() };
+      const id = Number($('docRow').value) || 0;
+      
       if(!data.date) return toast('تاریخ را وارد کنید', 'error');
       if(!data.account) return toast('دفتر معین را انتخاب کنید', 'error');
       if(!data.detail) return toast('دفتر تفصیلی را انتخاب کنید', 'error');
       if(debit === 0 && credit === 0) return toast('حداقل یکی از بدهکار یا بستانکار را وارد کنید', 'error');
       if(debit > 0 && credit > 0) return toast('در یک سند همزمان بدهکار و بستانکار را وارد نکنید', 'error');
+      
       setBusyButton('documentSaveBtn', true);
       try {
-        if(data.id){ await updateRecord('documents', data.id, data); } else { await addRecord('documents', data); }
-        closeModal('documentModal'); toast(data.id ? 'سند ویرایش شد' : 'سند ثبت شد');
+        if(id > 0) {
+          // ✅ اصلاح: فقط فیلدهای داده را آپدیت کن
+          await updateRecord('documents', id, data);
+        } else {
+          await addRecord('documents', data);
+        }
+        closeModal('documentModal'); toast(id > 0 ? 'سند ویرایش شد' : 'سند ثبت شد');
         await refreshData(true);
       } catch(err){ toast(err.message || 'خطا در ذخیره سند', 'error'); }
       finally{ setBusyButton('documentSaveBtn', false); }
@@ -1370,10 +1392,12 @@
       try{
         if(oldName){
           const accounts = await getAllRecords('accounts'); const account = accounts.find(a=>a.name===oldName);
-          if(account){ await updateRecord('accounts', account.id, {name}); 
+          if(account){ 
+            // ✅ اصلاح: فقط نام را آپدیت کن
+            await updateRecord('accounts', account.id, {name: name});
             const details = await getAllRecords('details'); const documents = await getAllRecords('documents');
-            for(const detail of details){ if(detail.account===oldName){ await updateRecord('details', detail.id, {...detail, account:name}); } }
-            for(const doc of documents){ if(doc.account===oldName){ await updateRecord('documents', doc.id, {...doc, account:name}); } }
+            for(const detail of details){ if(detail.account===oldName){ await updateRecord('details', detail.id, {account: name}); } }
+            for(const doc of documents){ if(doc.account===oldName){ await updateRecord('documents', doc.id, {account: name}); } }
           }
           toast('دفتر معین ویرایش شد');
         } else {
@@ -1403,7 +1427,14 @@
       try{
         if(oldName){
           const details = await getAllRecords('details'); const detail = details.find(d=>d.account===oldAccount && d.name===oldName && d.note===oldNote);
-          if(detail){ await updateRecord('details', detail.id, data); if(oldAccount!==data.account || oldName!==data.name){ const documents = await getAllRecords('documents'); for(const doc of documents){ if(doc.account===oldAccount && doc.detail===oldName){ await updateRecord('documents', doc.id, {...doc, account:data.account, detail:data.name}); } } } }
+          if(detail){ 
+            // ✅ اصلاح: فقط فیلدهای داده را آپدیت کن
+            await updateRecord('details', detail.id, data); 
+            if(oldAccount!==data.account || oldName!==data.name){ 
+              const documents = await getAllRecords('documents'); 
+              for(const doc of documents){ if(doc.account===oldAccount && doc.detail===oldName){ await updateRecord('documents', doc.id, {account:data.account, detail:data.name}); } } 
+            } 
+          }
           toast('تفصیلی ویرایش شد');
         } else {
           const details = await getAllRecords('details'); if(details.some(d=>d.account===data.account && d.name===data.name)) throw new Error('این تفصیلی قبلاً ثبت شده است');
